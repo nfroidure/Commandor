@@ -15,8 +15,8 @@ Consider this HTML snippet :
 	<form action="app:myApp/form?test=test&test2=test2">
 		<p>
 			My input : <input type="text" /><br />
+			<input type="submit" formaction="app:myApp/random" value="Random" />
 			<input type="submit" value="Submit" />
-			<input type="button" action="app:myApp/addfield" value="Add field" />
 		</p>
 	</form>
 </div>
@@ -28,22 +28,25 @@ First, create a Commandor instance in your code, the rootElement can be the docu
 var commandManager=new Commandor(document.querySelector('root'));
 ```
 
-```js
 Then register your commands :
-
+```js
 commandManager.suscribe('myApp/button', function(event, params) {
-	console.log(params['test']);
-}
+	alert(params['test']);
+});
 commandManager.suscribe('myApp/form', function(event, params, form) {
-	console.log(params['test'],
-		form[0].value);
-}
-commandManager.suscribe('myApp/addfield', function(event, params, form) {
-	var field=docucment.createElement('input');
-	field.setAttribute('type','text');
-	form.elements[form.elements.length-1].parentNode
-		.appendBefore(field,form.elements[form.elements.length-1]);
-}
+	alert(params['test']+','+form[0].value);
+});
+commandManager.suscribe('myApp/random', function(event, params, button) {
+  button.form.elements[button.form.elements.length-3].value=Math.random();
+});
 ```
 
+To dispose a command when no longer used :
 
+```js
+commandManager.unsuscribe('myApp/random');
+```
+
+Sample
+--------------
+You can find sample in the "test" folder ([view the test page](http://rest4.org/github/nfroidure/Commandor/master/test/index.html)).
