@@ -1,13 +1,6 @@
-// AMD stuff
-(function (root, factory) {
-	if (typeof define === 'function' && define.amd) {
-		// AMD. Register as an anonymous module.
-		define('Commandor', [], factory);
-	} else {
-		// Browser globals
-		root.Commandor = factory();
-	}
-})(this, function () {
+// AMD + global
+(function(root,define){ define([], function() {
+
 	// Commandor constructor : rootElement is the element
 	// from wich we capture commands
 	var Commandor=function Commandor(rootElement) {
@@ -99,9 +92,10 @@
 		if('A'===element.nodeName&&element.hasAttribute('href'))
 			command=element.getAttribute('href');
 		// executing the command
-		command&&this.executeCommand(event,command,element)
-			&&(event.stopPropagation()
-			||event.preventDefault());
+		(element.getAttribute('disabled')
+			||(command&&this.executeCommand(event,command,element)))
+				&&(event.stopPropagation()
+				||event.preventDefault());
 	};
 
 	// Form change handler
@@ -193,4 +187,8 @@
 	};
 
 	return Commandor;
+
+
+})})(this,typeof define === 'function' && define.amd ? define : function (deps, factory) {
+	this['Commandor']=factory.apply(this, deps)
 });
