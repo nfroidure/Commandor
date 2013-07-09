@@ -1,5 +1,7 @@
-// AMD + global
+// AMD + Global: r.js compatible
+// Use START + END markers to keep module content only
 (function(root,define){ define([], function() {
+// START: Module logic start
 
 	// Commandor constructor : rootElement is the element
 	// from wich we capture commands
@@ -186,9 +188,16 @@
 		command[nodes[i]]=null;
 	};
 
+// END: Module logic end
+
 	return Commandor;
 
-
-})})(this,typeof define === 'function' && define.amd ? define : function (deps, factory) {
-	this['Commandor']=factory.apply(this, deps)
-});
+});})(this,typeof define === 'function' && define.amd ? define : function (name, deps, factory) {
+	var root=this;
+	if(typeof name === 'object') {
+		factory=deps; deps=name; name='Commandor';
+	}
+	this[name.substring(name.lastIndexOf('/')+1)]=factory.apply(this, deps.map(function(dep){
+		return root[dep.substring(dep.lastIndexOf('/')+1)];
+	}));
+}.bind(this));
