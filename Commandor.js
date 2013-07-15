@@ -6,7 +6,7 @@
 	// Commandor constructor : rootElement is the element
 	// from wich we capture commands
 	var Commandor=function Commandor(rootElement) {
-		if((!rootElement)||! (rootElement instanceof HTMLElement))
+		if(!rootElement)
 			throw Error('No rootElement given');
 		// Commands hashmap
 		this.commands={};

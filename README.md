@@ -47,6 +47,11 @@ To dispose a command when no longer used :
 commandManager.unsuscribe('myApp/random');
 ```
 
-Sample
+Samples
 --------------
-You can find sample in the "test" folder ([view the test page](http://rest4.org/github/nfroidure/Commandor/master/test/index.html)).
+*	You can find a sample in the "test" folder ([view the test page](http://rest4.org/github/nfroidure/Commandor/master/test/index.html)).
+*	Here are some apps using Commandor : http://memory.insertafter.com/index.html http://liar.insertafter.com/index.html
+
+About CommandPromise
+--------------
+This is intended to be used with this Promise library : https://github.com/nfroidure/Promise
