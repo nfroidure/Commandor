@@ -52,6 +52,11 @@ Samples
 *	You can find a sample in the "test" folder ([view the test page](http://rest4.org/github/nfroidure/Commandor/master/test/index.html)).
 *	Here are some apps using Commandor : http://memory.insertafter.com/index.html http://liar.insertafter.com/index.html
 
+Supported browsers
+--------------
+Firefox, Chrome, Safari, Opera and IE9+.
+IE8 by polyfilling (bind + addEventListener).
+
 About CommandPromise
 --------------
 This is intended to be used with this Promise library : https://github.com/nfroidure/Promise
