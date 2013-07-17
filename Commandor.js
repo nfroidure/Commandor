@@ -10,8 +10,6 @@
 			throw Error('No rootElement given');
 		// Commands hashmap
 		this.commands={};
-		// Helper for event listening
-		rootElement.addEvent=rootElement.addEventListener||rootElement.attachEvent;
 		// keeping a reference to the rootElement
 		this.rootElement=rootElement;
 		// MS Pointer events
@@ -19,26 +17,38 @@
 			// event listeners for buttons
 			(function() {
 				var curElement=null;
-					this.rootElement.addEvent('MSPointerDown', function(event) {
+					this.rootElement.addEventListener('MSPointerDown', function(event) {
 					curElement=this.findButton(event.target);
+						event.preventDefault();
+						event.stopPropagation();
 					}.bind(this),true);
-				this.rootElement.addEvent('MSPointerUp', function(event) {
+				this.rootElement.addEventListener('MSPointerUp', function(event) {
 					if(curElement==this.findButton(event.target))
 						this.captureButton(event);
 					else
 						curElement=null;
 					}.bind(this),true);
 			}).call(this);
+			// fucking IE10 bug
+			this.rootElement.addEventListener('click',
+				function(event){
+					var element=this.findButton(event.target),
+						command=this.getCommandFromButton(element);
+					if(0===command.indexOf('app:')) {
+						event.preventDefault();
+						event.stopPropagation();
+					}
+				}.bind(this),true);
 		} else {
 			// Webkit touch events
 			if(!!('ontouchstart' in window)) {
 				(function() {
 					var curElement=null;
 					// variable contenant le dernier élément visé
-					this.rootElement.addEvent('touchstart', function(event) {
+					this.rootElement.addEventListener('touchstart', function(event) {
 						curElement=this.findButton(event.target);
 						}.bind(this),true);
-					this.rootElement.addEvent('touchend', function(event) {
+					this.rootElement.addEventListener('touchend', function(event) {
 						// on vérifie qu'on est toujours sur le même élément
 						if(curElement==this.findButton(event.target))
 							this.captureButton(event);
@@ -49,18 +59,18 @@
 				}).call(this);
 			}
 		// Clic events
-		this.rootElement.addEvent('click',
+		this.rootElement.addEventListener('click',
 			this.captureButton.bind(this),true);
 		}
 	// event listeners for forms submission
-	this.rootElement.addEvent('submit',
+	this.rootElement.addEventListener('submit',
 		this.captureForm.bind(this),true);
 	// event listeners for form changes
-	this.rootElement.addEvent('change',
+	this.rootElement.addEventListener('change',
 		this.formChange.bind(this),true);
-	this.rootElement.addEvent('input',
+	this.rootElement.addEventListener('input',
 		this.formChange.bind(this),true);
-	this.rootElement.addEvent('select',
+	this.rootElement.addEventListener('select',
 		this.formChange.bind(this),true);
 	}
 
@@ -73,17 +83,15 @@
 			&&(element.nodeName!='INPUT'
 					||(!element.hasAttribute('type'))
 					||element.getAttribute('type')!='submit'
-					||!element.hasAttribute('formaction')))
-			{
+					||!element.hasAttribute('formaction'))) {
 			element=element.parentNode;
-			}
-		return element;
 		}
+		return element;
+	}
 
-	// Button command handler
-	Commandor.prototype.captureButton=function(event) {
-		var element=this.findButton(event.target),
-			command='';
+	// Extract the command for a button
+	Commandor.prototype.getCommandFromButton=function(element) {
+		var command='';
 		// looking for a button with formaction attribute
 		if('INPUT'===element.nodeName
 				&&element.hasAttribute('type')
@@ -93,6 +101,13 @@
 		// looking for a link
 		if('A'===element.nodeName&&element.hasAttribute('href'))
 			command=element.getAttribute('href');
+		return command;
+	}
+
+	// Button command handler
+	Commandor.prototype.captureButton=function(event) {
+		var element=this.findButton(event.target),
+			command=this.getCommandFromButton(element);
 		// executing the command
 		(element.getAttribute('disabled')
 			||(command&&this.executeCommand(event,command,element)))
