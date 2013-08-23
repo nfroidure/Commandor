@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Commandor : Testing page</title>
+</head>
+<body>
+	<div class="root">
+		<p><a href="app:myApp/button?test=test&test2=test2">My button</a></p>
+		<form action="app:myApp/form?test=test&test2=test2">
+			<p>
+				My input : <input type="text" /><br />
+				<input type="submit" formaction="app:myApp/random" value="Random" />
+				<input type="submit" value="Submit" />
+			</p>
+		</form>
+	</div>
+	<script type="text/javascript" src="../Commandor.js"></script>
+	<script type="text/javascript">
+  var commandManager=new Commandor(document.querySelector('.root'));
+  commandManager.suscribe('myApp/button', function(event, params) {
+  	alert(params['test']);
+  });
+  commandManager.suscribe('myApp/form', function(event, params, form) {
+  	alert(params['test']+','+form[0].value);
+  });
+  commandManager.suscribe('myApp/random', function(event, params, button) {
+	  button.form.elements[button.form.elements.length-3].value=Math.random();
+  });
+	</script>
+</body>
+</html>
