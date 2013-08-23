@@ -5,7 +5,7 @@ module.exports = function(config) {
   config.set({
 
     // base path, that will be used to resolve files and exclude
-    basePath: '',
+    basePath: '.',
 
 
     // frameworks to use
@@ -14,16 +14,16 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
+    	'tests/main.karma.js',
       {pattern: 'src/*.js', included: false},
-      {pattern: 'tests/*.mocha.js', included: false},
-      {pattern: 'tests/index.html', included: false}
+      {pattern: 'tests/*.mocha.js', included: false}
     ],
 
 
-    // list of files to exclude
+    /*// list of files to exclude
     exclude: [
       
-    ],
+    ],*/
 
 
     // test results reporter to use
@@ -45,7 +45,7 @@ module.exports = function(config) {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
 
     // Start these browsers, currently available:

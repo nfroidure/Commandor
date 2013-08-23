@@ -62,6 +62,19 @@
 		this.rootElement.addEventListener('click',
 			this.captureButton.bind(this),true);
 		}
+	// Keyboard events
+	// Cancel keydown action (no click event)
+	this.rootElement.addEventListener('keydown',function(event) {
+		if(13===event.keyCode&&this.findButton(event.target)) {
+			event.preventDefault()&&event.stopPropagation();
+		}
+	}.bind(this),true);
+	// Fire on keyup
+	this.rootElement.addEventListener('keyup',function(event) {
+		if(13===event.keyCode&&!event.ctrlKey) {
+			this.captureButton.apply(this, arguments);
+		}
+	}.bind(this),true);
 	// event listeners for forms submission
 	this.rootElement.addEventListener('submit',
 		this.captureForm.bind(this),true);
