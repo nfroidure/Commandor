@@ -3,17 +3,16 @@
 (function(root,define){ define(['./../promise/Promise'], function(Promise) {
 // START: Module logic start
 
-	// XHR promise constructor
+	// Command promise constructor
 	function CommandPromise(commandor,command,view) {
 		if(!(this instanceof CommandPromise))
 			throw Error('Use new to intantiate !');
-		Promise.call(this,function(success) { console.log('register: '+view+'/'+command);
+		Promise.call(this,function(success) {
 			commandor.suscribe(view+'/'+command,function(event, params, element) {
 				dispose();
 				success({'event':event, 'params':params, 'element': element });
-
 			});
-			var dispose=function() { console.log('unregister: '+view+'/'+command);
+			var dispose=function() {
 				commandor.unsuscribe(view+'/'+command);
 			};
 			return dispose;

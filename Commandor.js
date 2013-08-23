@@ -68,8 +68,6 @@
 	// event listeners for form changes
 	this.rootElement.addEventListener('change',
 		this.formChange.bind(this),true);
-	this.rootElement.addEventListener('input',
-		this.formChange.bind(this),true);
 	this.rootElement.addEventListener('select',
 		this.formChange.bind(this),true);
 	}
