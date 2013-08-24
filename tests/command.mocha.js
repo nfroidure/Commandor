@@ -1,102 +1,7 @@
 // AMD + Global: r.js compatible
 // Use START + END markers to keep module content only
-(function(root,define){ define(['src/Commandor'], function(Commandor) {
+(function(root,define){ define(['src/Commandor','tests/helper.karma'], function(Commandor,hlp) {
 // START: Module logic start
-
-	// Helpers
-	function mouse(element,options) {
-		options=options||{};
-		var event = document.createEvent('MouseEvent');
-		event.initMouseEvent(options.type||'click',
-			'false' === options.canBubble ? false : true,
-			'false' === options.cancelable ? false : true,
-			options.view||window,
-			options.detail||1,
-			options.screenX||0, options.screenY||0,
-			options.clientX||0, options.clientY||0,
-			!!options.ctrlKey, !!options.altKey,
-			!!options.shiftKey, !!options.metaKey,
-			options.button||0,
-			options.relatedTarget||element);
-		element.dispatchEvent(event);
-	}
-
-	function click(element,options) {
-		options=options||{};
-		options.type='mousedown';
-		mouse(element, options);
-		options.type='click';
-		mouse(element, options);
-		options.type='mouseup';
-		mouse(element, options);
-	}
-
-	function tactile(element,options) {
-		options=options||{};
-		var event = document.createEvent('UIEvent');
-		event.initUIEvent(options.type, true, true);
-		event.view = options.view||window;
-		event.altKey = !!options.altKey;
-		event.ctrlKey = !!options.ctrlKey;
-		event.shiftKey = !!options.shiftKey;
-		event.metaKey = !!options.metaKey;
-		element.dispatchEvent(event);
-	}
-
-	function touch(element,options) {
-		options=options||{};
-		options.type='touchstart';
-		tactile(element, options);
-		options.type='touchend';
-		tactile(element, options);
-	}
-
-	function keyboard(element,options) {
-		options=options||{};
-		var event = document.createEvent('KeyboardEvent');
-		// Defaults
-		options.ctrlKey = options.ctrlKey|false
-		options.altKey = options.altKey|false
-		options.shiftKey = options.shiftKey|false
-		options.metaKey = options.metaKey|false;
-		// Chromium Hack
-		Object.defineProperty(event, 'keyCode', {
-			get : function() {
-				return options.keyCode|0;
-			}
-		});
-		Object.defineProperty(event, 'which', {
-			get : function() {
-				return options.keyCode|0;
-			}
-		});
-		Object.defineProperty(event, 'ctrlKey', {
-			get : function() {
-				return options.ctrlKey;
-			}
-		});
-		event[typeof event.initKeyboardEvent !== 'undefined'
-			? "initKeyboardEvent" : "initKeyEvent"](options.type,
-			'false' === options.canBubble ? false : true,
-			'false' === options.cancelable ? false : true,
-			options.view||window, options.char|'',
-			options.charCode|0, options.keyCode|0,
-			options.location|0, options.modifier|'',
-			options.repeat|false, options.locale|'');
-		event.keyCodeVal=options.keyCode|0;
-		event.ctrlKey=options.ctrlKey;
-		event.shiftKey=options.shiftKey|false;
-		event.altKey=options.altKey|false;
-		element.dispatchEvent(event);
-	}
-
-	function type(element,options) {
-		options=options||{};
-		options.type='keydown';
-		keyboard(element, options);
-		options.type='keyup';
-		keyboard(element, options);
-	}
 
 	// Tests
 	describe('Link commands should work', function(){
@@ -120,7 +25,7 @@
 
 		it('when clicking a link', function() {
 			runResult=null;
-			click(a);
+			hlp.click(a);
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -133,7 +38,7 @@
 		if(!!('ontouchstart' in window)) {
 			it('when touching a link', function() {
 				runResult=null;
-				touch(a);
+				hlp.touch(a);
 				if(null===runResult) {
 					throw 'Not well executed';
 				}
@@ -147,7 +52,7 @@
 		it('when pressing enter key on a link', function() {
 			runResult=null;
 			a.focus();
-			keyboard(a,{type:'keyup',keyCode:13});
+			hlp.keyboard(a,{type:'keyup',keyCode:13});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
