@@ -1,0 +1,29 @@
+{
+	"name": "commandor",
+	"description": "Command events listening, made easy.",
+	"version": "0.1.0",
+	"author": "Nicolas Froidure",
+	"repository": {
+	"type": "git",
+	"url": "http://github.com/nfroidure/Commandor.git"
+	},
+	"engines": {
+		"node": "*"
+	},
+	"dependencies": {},
+	"devDependencies": {
+		"mocha": "~1.7.0",
+		"karma": "~0.10.1",
+		"karma-slimerjs-launcher": "~0.1.1",
+		"requirejs": "*"
+	},
+	"scripts": {
+		"test": "karma start karma.conf.js --single-run --browsers SlimerJS"
+	},
+	"keywords": [
+		"command",
+		"events"
+	],
+	"main": "./src/Commandor.js",
+	"preferGlobal": "false"
+}

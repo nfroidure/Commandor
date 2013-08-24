@@ -1,4 +1,4 @@
-Commandor
+Commandor [![Build Status](https://travis-ci.org/nfroidure/Commandor.png?branch=master)](https://travis-ci.org/nfroidure/Commandor)
 ==============
 
 Commandor simplify command/form events management by creating a single endpoint
