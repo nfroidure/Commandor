@@ -12,29 +12,27 @@
 		this.commands={};
 		// keeping a reference to the rootElement
 		this.rootElement=rootElement;
-		// MS Pointer events
+		// MS Pointer events : should unify pointers, but... read and see by yourself. 
 		if(!!('onmsgesturechange' in window)) {
 			// event listeners for buttons
 			(function() {
 				var curElement=null;
 					this.rootElement.addEventListener('MSPointerDown', function(event) {
-					curElement=this.findButton(event.target);
-						event.preventDefault();
-						event.stopPropagation();
+						curElement=this.findButton(event.target);
+						curElement&&event.preventDefault()||event.stopPropagation();
 					}.bind(this),true);
 				this.rootElement.addEventListener('MSPointerUp', function(event) {
-					if(curElement==this.findButton(event.target))
+					if(curElement&&curElement===this.findButton(event.target))
 						this.captureButton(event);
 					else
 						curElement=null;
 					}.bind(this),true);
 			}).call(this);
-			// fucking IE10 bug
+			// fucking IE10 bug : it doesn't cancel click event
+			// when gesture events are cancelled
 			this.rootElement.addEventListener('click',
 				function(event){
-					var element=this.findButton(event.target),
-						command=this.getCommandFromButton(element);
-					if(0===command.indexOf('app:')) {
+					if(this.findButton(event.target)) {
 						event.preventDefault();
 						event.stopPropagation();
 					}
@@ -43,18 +41,19 @@
 			// Webkit touch events
 			if(!!('ontouchstart' in window)) {
 				(function() {
+					// a var keepin' the touchstart element
 					var curElement=null;
-					// variable contenant le dernier élément visé
 					this.rootElement.addEventListener('touchstart', function(event) {
 						curElement=this.findButton(event.target);
-						}.bind(this),true);
+						curElement&&event.preventDefault()||event.stopPropagation();
+					}.bind(this),true);
+					// checking it's the same at touchend, capturing command if so
 					this.rootElement.addEventListener('touchend', function(event) {
-						// on vérifie qu'on est toujours sur le même élément
-						if(curElement==this.findButton(event.target))
+						if(curElement==this.findButton(event.target)) {
 							this.captureButton(event);
-						// sinon, on vide la variable
-						else
+						} else {
 							curElement=null;
+						}
 					}.bind(this),true);
 				}).call(this);
 			}
@@ -65,14 +64,22 @@
 	// Keyboard events
 	// Cancel keydown action (no click event)
 	this.rootElement.addEventListener('keydown',function(event) {
-		if(13===event.keyCode&&this.findButton(event.target)) {
+		if(13===event.keyCode&&(this.findButton(event.target)
+			||this.findForm(event.target))) {
 			event.preventDefault()&&event.stopPropagation();
 		}
 	}.bind(this),true);
 	// Fire on keyup
 	this.rootElement.addEventListener('keyup',function(event) {
+		console.log(event);
 		if(13===event.keyCode&&!event.ctrlKey) {
-			this.captureButton.apply(this, arguments);
+			if(this.findButton(event.target)) {
+		console.log(1);
+				this.captureButton.apply(this, arguments);
+			} else {
+		console.log(2);
+				this.captureForm.apply(this, arguments);
+			}
 		}
 	}.bind(this),true);
 	// event listeners for forms submission
@@ -87,54 +94,76 @@
 
 	// Look for a button
 	Commandor.prototype.findButton=function(element) {
-		// on remonte les parent de l'élément pour
-		// trouver un lien ou un bouton de soumission
-		while(element!==this.rootElement
-			&&element.nodeName!=='A'
-			&&(element.nodeName!='INPUT'
-					||(!element.hasAttribute('type'))
-					||element.getAttribute('type')!='submit'
-					||!element.hasAttribute('formaction'))) {
+		while(element&&element.parentNode) {
+			if('A'===element.nodeName
+				&&element.hasAttribute('href')
+				&&-1!==element.getAttribute('href').indexOf('app:')) {
+				return element;
+			}
+			if('INPUT'===element.nodeName&&element.hasAttribute('type')
+				&&(element.getAttribute('type')=='submit'
+						||element.getAttribute('type')=='button')
+				&&element.hasAttribute('formaction')
+				&&-1!==element.getAttribute('formaction').indexOf('app:')
+				) {
+				return element;
+			}
+			if(element===this.rootElement) {
+				return null;
+			}
+			element=element.parentNode;
+		}
+		return null;
+	}
+
+	// Look for a form
+	Commandor.prototype.findForm=function(element) {
+		while(element&&element.parentNode) {
+			if('FORM'===element.nodeName&&element.hasAttribute('action')
+				&&-1!==element.getAttribute('action').indexOf('app:')) {
+				return element;
+			}
+			if(element===this.rootElement) {
+				return null;
+			}
 			element=element.parentNode;
 		}
 		return element;
-	}
+	};
 
 	// Extract the command for a button
-	Commandor.prototype.getCommandFromButton=function(element) {
+	Commandor.prototype.doCommandOfButton=function(element) {
 		var command='';
 		// looking for a button with formaction attribute
-		if('INPUT'===element.nodeName
-				&&element.hasAttribute('type')
-				&&element.getAttribute('type')=='submit'
-				&&element.hasAttribute('formaction'))
+		if('INPUT'===element.nodeName) {
 			command=element.getAttribute('formaction');
 		// looking for a link
-		if('A'===element.nodeName&&element.hasAttribute('href'))
+		} else if('A'===element.nodeName) {
 			command=element.getAttribute('href');
-		return command;
-	}
-
-	// Button command handler
-	Commandor.prototype.captureButton=function(event) {
-		var element=this.findButton(event.target),
-			command=this.getCommandFromButton(element);
+		}
 		// executing the command
-		(element.getAttribute('disabled')
-			||(command&&this.executeCommand(event,command,element)))
-				&&(event.stopPropagation()
-				||event.preventDefault());
+		this.executeCommand(event,command,element);
+	};
+
+	// Button event handler
+	Commandor.prototype.captureButton=function(event) {
+		var element=this.findButton(event.target);
+		// if there is a button, stop event
+		if(element) {
+			// if the button is not disabled, run the command
+			if((!element.hasAttribute('disabled'))
+				||'disabled'===element.getAttribute('disabled')) {
+				this.doCommandOfButton(element);
+			}
+			event.stopPropagation()||event.preventDefault();
+		}
 	};
 
 	// Form change handler
 	Commandor.prototype.formChange=function(event) {
-		var element=event.target,
-			command='';
 		// find the evolved form
-		while(element!==this.rootElement
-			&&'FORM'!==element.nodeName) {
-			element=element.parentNode;
-		}
+		var element=this.findForm(event.target),
+			command='';
 		// searching the data-change attribute containing the command
 		if('FORM'===element.nodeName&&element.hasAttribute('data-change'))
 			command=element.getAttribute('data-change');
@@ -142,23 +171,29 @@
 		command&&this.executeCommand(event,command,element);
 	};
 
+	// Extract the command for a button
+	Commandor.prototype.doCommandOfForm=function(element) {
+		var command='';
+		// looking for a button with formaction attribute
+		if('FORM'===element.nodeName) {
+			command=element.getAttribute('action');
+		}
+		// executing the command
+		this.executeCommand(event,command,element);
+	};
+
 	// Form command handler
 	Commandor.prototype.captureForm=function(event) {
-		var element=event.target,
-			command='';
-		while(element!==this.rootElement
-			&&'FORM'!==element.nodeName) {
-			element=element.parentNode;
+		var element=this.findForm(event.target);
+		// if there is a button, stop event
+		if(element) {
+			// if the button is not disabled, run the command
+			if((!element.hasAttribute('disabled'))
+				||'disabled'===element.getAttribute('disabled')) {
+				this.doCommandOfForm(element);
 			}
-		// Si l'élément est un formulaire et propose une commande
-		if('FORM'===element.nodeName&&element.hasAttribute('action'))
-			command=element.getAttribute('action');
-		// Si la commande existe on stoppe la propagation
-		// et on annule l'évènement
-		command
-			&&this.executeCommand(event,command,element)
-			&&(event.stopPropagation()
-			||event.preventDefault());
+			event.stopPropagation()||event.preventDefault();
+		}
 	};
 
 	// Common command executor
