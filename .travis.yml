@@ -2,10 +2,11 @@ language: node_js
 before_script:
   - wget http://download.slimerjs.org/v0.8/slimerjs-0.8.2-linux-i686.tar.bz2
   - tar -jxf slimerjs-0.8.2-linux-i686.tar.bz2
-  - SLIMERJSLAUNCHER="/home/travis/build/nfroidure/Commandor/slimerjs-0.8.2/slimerjs"
-  - PATH="$PATH:/home/travis/build/nfroidure/Commandor/slimerjs-0.8.2/"
+  - SLIMERJSLAUNCHER="${pwd}/slimerjs-0.8.2/slimerjs"
+  - PATH="$PATH:${pwd}/slimerjs-0.8.2"
   - echo $PATH
   - echo $SLIMERJSLAUNCHER
-  - ls /home/travis/build/nfroidure/Commandor
+  - ls
+  - pwd
 node_js:
   - 0.8
