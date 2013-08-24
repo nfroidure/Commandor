@@ -20,16 +20,19 @@
 				var curElement=null;
 				this.rootElement.addEventListener('MSPointerDown', function(event) {
 				console.log(event.type,event);
-					curElement=this.findButton(event.target);
+					curElement=this.findButton(event.target)||this.findForm(event.target);
 					curElement&&event.preventDefault()||event.stopPropagation();
 				}.bind(this),true);
 				this.rootElement.addEventListener('MSPointerUp', function(event) {
-								console.log(event.type,event);
-					if(curElement&&curElement===this.findButton(event.target)) {
-						this.captureButton(event);
+					if(curElement) {
+						if(curElement===this.findButton(event.target)) {
+							this.captureButton(event);
+						} else if(curElement===this.findForm(event.target)) {
+							this.captureForm(event);
+						}
 						event.preventDefault(); event.stopPropagation();
+						curElement=null;
 					}
-					curElement=null;
 				}.bind(this),true);
 			}).call(this);
 			// fucking IE10 bug : it doesn't cancel click event

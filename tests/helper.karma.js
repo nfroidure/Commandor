@@ -69,7 +69,8 @@
 	// Pointer interactions
 	function pointer(element,options) {
 		options=options||{};
-		var event = MSPointerEvent.initPointerEvent(options.type,
+		var event = document.createEvent('MSPointerEvent');
+		event.initPointerEvent(options.type,
 			'false' === options.canBubble ? false : true,
 			'false' === options.cancelable ? false : true,
 			options.view||window,
