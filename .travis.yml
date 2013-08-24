@@ -1,5 +1,10 @@
 language: node_js
 before_script:
-  - wget http://download.slimerjs.org/v0.8/slimerjs-0.8.2-linux-i686.tar.bz2; tar -jxf slimerjs-0.8.2-linux-i686.tar.bz2; SLIMERJSLAUNCHER="${cwd}/slimerjs-0.8.2/slimerjs"; PATH="$PATH:${cwd}/slimerjs-0.8.2/"
+  - wget http://download.slimerjs.org/v0.8/slimerjs-0.8.2-linux-i686.tar.bz2;
+  - tar -jxf slimerjs-0.8.2-linux-i686.tar.bz2
+  - SLIMERJSLAUNCHER="${cwd}/slimerjs-0.8.2/slimerjs"
+  - PATH="$PATH:${cwd}/slimerjs-0.8.2/"
+  - echo $PATH
+  - echo $SLIMERJSLAUNCHER
 node_js:
   - 0.8
