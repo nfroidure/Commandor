@@ -26,7 +26,11 @@
 
 		it('when clicking a link', function() {
 			runResult=null;
-			hlp.click(a);
+			if(!!('onmsgesturechange' in window)) {
+				hlp.point(a);
+			} else {
+				hlp.click(a);
+			}
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

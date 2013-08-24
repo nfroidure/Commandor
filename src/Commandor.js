@@ -19,10 +19,12 @@
 			(function() {
 				var curElement=null;
 				this.rootElement.addEventListener('MSPointerDown', function(event) {
+				console.log(event.type,event);
 					curElement=this.findButton(event.target);
 					curElement&&event.preventDefault()||event.stopPropagation();
 				}.bind(this),true);
 				this.rootElement.addEventListener('MSPointerUp', function(event) {
+								console.log(event.type,event);
 					if(curElement&&curElement===this.findButton(event.target)) {
 						this.captureButton(event);
 						event.preventDefault(); event.stopPropagation();

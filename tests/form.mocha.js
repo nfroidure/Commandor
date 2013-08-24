@@ -27,7 +27,11 @@
 		// Simple submit button
 		it('when clicking a submit button', function() {
 			runResult=null;
-			hlp.click(submitButton);
+			if(!!('onmsgesturechange' in window)) {
+				hlp.point(submitButton);
+			} else {
+				hlp.click(submitButton);
+			}
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -67,7 +71,11 @@
 		// Submit button with formaction
 		it('when clicking a submit button with formaction', function() {
 			runResult=null;
-			hlp.click(actionButton);
+			if(!!('onmsgesturechange' in window)) {
+				hlp.point(actionButton);
+			} else {
+				hlp.click(actionButton);
+			}
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
