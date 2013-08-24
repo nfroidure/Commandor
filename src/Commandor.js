@@ -19,7 +19,6 @@
 			(function() {
 				var curElement=null;
 				this.rootElement.addEventListener('MSPointerDown', function(event) {
-				console.log(event.type,event);
 					curElement=this.findButton(event.target)||this.findForm(event.target);
 					curElement&&event.preventDefault()||event.stopPropagation();
 				}.bind(this),true);

@@ -1,7 +1,8 @@
 Commandor
 ==============
 
-Commandor simplify command/form events management by creating a single endpoint for them (implements the mediator pattern).
+Commandor simplify command/form events management by creating a single endpoint
+ for them (implements the mediator pattern).
 
 It introduce an app: protocol to refer to commands directly inside your HTML.
 
@@ -11,8 +12,8 @@ How to use Commandor
 Consider this HTML snippet :
 ```html
 <div class="root">
-	<p><a href="app:myApp/button?test=test&test2=test2">My button</a></p>
-	<form action="app:myApp/form?test=test&test2=test2">
+	<p><a href="app:myApp/button">My button</a></p>
+	<form action="app:myApp/form">
 		<p>
 			My input : <input type="text" /><br />
 			<input type="submit" formaction="app:myApp/random" value="Random" />
@@ -22,7 +23,8 @@ Consider this HTML snippet :
 </div>
 ```
 
-First, create a Commandor instance in your code, the rootElement can be the document body or any other DOM element :
+First, create a Commandor instance in your code, the rootElement can be the
+ document body or any other DOM element :
 
 ```js
 var commandManager=new Commandor(document.querySelector('root'));
@@ -31,10 +33,10 @@ var commandManager=new Commandor(document.querySelector('root'));
 Then register your commands :
 ```js
 commandManager.suscribe('myApp/button', function(event, params) {
-	alert(params['test']);
+	console.log('Button activated');
 });
 commandManager.suscribe('myApp/form', function(event, params, form) {
-	alert(params['test']+','+form[0].value);
+	console.log('Form submitted,'+form[0].value);
 });
 commandManager.suscribe('myApp/random', function(event, params, button) {
   button.form.elements[button.form.elements.length-3].value=Math.random();
@@ -47,15 +49,45 @@ To dispose a command when no longer used :
 commandManager.unsuscribe('myApp/random');
 ```
 
+You can create many commandor instances to keep your code more modular or you
+cant use namespaced commands like above.
+
+Command can pass parameters to allow you to manage multiple call of the same command :
+
+```html
+<div id="posts">
+	<article>
+		<h1>title</h1>
+		<p><a href="app:delete?id=1">del</a></p>
+	</article>
+	<article>
+		<h1>title</h1>
+		<p><a href="app:delete?id=2">del</a></p>
+	</article>
+</div>
+```
+
+```js
+var commandManager=new Commandor(document.getElementById('posts'));
+commandManager.suscribe('delete',function(event,params,element) {
+	console.log('Removed article '+params['id']);
+	element.parentNode.parentNode.removeChild(element.parentNode);
+});
+```
+
 Samples
 --------------
-*	You can find a sample in the "test" folder ([view the test page](http://rest4.org/github/nfroidure/Commandor/master/test/index.html)).
-*	Here are some apps using Commandor : http://memory.insertafter.com/index.html http://liar.insertafter.com/index.html
+*	Here are some apps using Commandor :
+* * http://hexa.insertafter.com/index.html
+* * http://memory.insertafter.com/index.html
+* * http://breakit.elitwork.com/index.html
+* * http://liar.insertafter.com/index.html
 
 Supported browsers
 --------------
-Firefox, Chrome, Safari, Opera and IE9+.
-IE8 by polyfilling (bind + addEventListener).
+Firefox, Chrome, Opera and IE9+ (fully tested).
+Safari should be ok (not tested, DIY or buy me a Mac).
+IE8 by polyfilling (bind + addEventListener) (never tried).
 
 About CommandPromise
 --------------
