@@ -107,7 +107,6 @@
 		function testCommand() {
 			var n=runResult&&runResult.n||0;
 			runResult=Array.prototype.slice.call(arguments,0);
-			//console.log('test',arguments, runResult);
 			runResult.n=++n;
 		}
 		cmdMgr.suscribe('test',testCommand);

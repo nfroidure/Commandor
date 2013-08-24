@@ -6,8 +6,9 @@
 	// Commandor constructor : rootElement is the element
 	// from wich we capture commands
 	var Commandor=function Commandor(rootElement) {
-		if(!rootElement)
+		if(!rootElement) {
 			throw Error('No rootElement given');
+		}
 		// Commands hashmap
 		this.commands={};
 		// keeping a reference to the rootElement
@@ -17,16 +18,17 @@
 			// event listeners for buttons
 			(function() {
 				var curElement=null;
-					this.rootElement.addEventListener('MSPointerDown', function(event) {
-						curElement=this.findButton(event.target);
-						curElement&&event.preventDefault()||event.stopPropagation();
-					}.bind(this),true);
+				this.rootElement.addEventListener('MSPointerDown', function(event) {
+					curElement=this.findButton(event.target);
+					curElement&&event.preventDefault()||event.stopPropagation();
+				}.bind(this),true);
 				this.rootElement.addEventListener('MSPointerUp', function(event) {
-					if(curElement&&curElement===this.findButton(event.target))
+					if(curElement&&curElement===this.findButton(event.target)) {
 						this.captureButton(event);
-					else
-						curElement=null;
-					}.bind(this),true);
+						event.preventDefault(); event.stopPropagation();
+					}
+					curElement=null;
+				}.bind(this),true);
 			}).call(this);
 			// fucking IE10 bug : it doesn't cancel click event
 			// when gesture events are cancelled
@@ -71,13 +73,10 @@
 	}.bind(this),true);
 	// Fire on keyup
 	this.rootElement.addEventListener('keyup',function(event) {
-		console.log(event);
 		if(13===event.keyCode&&!event.ctrlKey) {
 			if(this.findButton(event.target)) {
-		console.log(1);
 				this.captureButton.apply(this, arguments);
 			} else {
-		console.log(2);
 				this.captureForm.apply(this, arguments);
 			}
 		}
@@ -165,8 +164,9 @@
 		var element=this.findForm(event.target),
 			command='';
 		// searching the data-change attribute containing the command
-		if('FORM'===element.nodeName&&element.hasAttribute('data-change'))
+		if('FORM'===element.nodeName&&element.hasAttribute('data-change')) {
 			command=element.getAttribute('data-change');
+		}
 		// executing the command
 		command&&this.executeCommand(event,command,element);
 	};
