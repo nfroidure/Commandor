@@ -14,6 +14,7 @@
 		var cmdMgr=new Commandor(div);
 		var runResult=null;
 		function testCommand() {
+			console.log('Runned.');
 			var n=runResult&&runResult.n||0;
 			runResult=Array.prototype.slice.call(arguments,0);
 			runResult.n=++n;
@@ -53,7 +54,7 @@
 		it('when pressing enter key on a submit button', function() {
 			runResult=null;
 			submitButton.focus();
-			hlp.keyboard(submitButton,{type:'keyup',keyCode:13});
+			hlp.type(submitButton,{type:'keyup',keyCode:13});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -93,7 +94,7 @@
 		it('when pressing enter key on a submit button with formaction', function() {
 			runResult=null;
 			submitButton.focus();
-			hlp.keyboard(actionButton,{type:'keyup',keyCode:13});
+			hlp.type(actionButton,{type:'keyup',keyCode:13});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

@@ -10,6 +10,7 @@
 		var cmdMgr=new Commandor(div);
 		var runResult=null;
 		function testCommand() {
+			console.log('Runned.');
 			var n=runResult&&runResult.n||0;
 			runResult=Array.prototype.slice.call(arguments,0);
 			runResult.n=++n;
@@ -52,7 +53,7 @@
 		it('when pressing enter key on a link', function() {
 			runResult=null;
 			a.focus();
-			hlp.keyboard(a,{type:'keyup',keyCode:13});
+			hlp.type(a,{keyCode:13});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

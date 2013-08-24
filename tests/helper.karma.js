@@ -3,20 +3,56 @@
 (function(root,define){ define([], function() {
 // START: Module logic start
 
-	function mouse(element,options) {
+	// Generic event
+	function event(element,options) {
 		options=options||{};
-		var event = document.createEvent('MouseEvent');
-		event.initMouseEvent(options.type||'click',
+		var event = document.createEvent('Event');
+		event.initEvent(options.type,
 			'false' === options.canBubble ? false : true,
-			'false' === options.cancelable ? false : true,
-			options.view||window,
-			options.detail||1,
-			options.screenX||0, options.screenY||0,
-			options.clientX||0, options.clientY||0,
-			!!options.ctrlKey, !!options.altKey,
-			!!options.shiftKey, !!options.metaKey,
-			options.button||0,
-			options.relatedTarget||element);
+			'false' === options.cancelable ? false : true);
+		element.dispatchEvent(event);
+	}
+
+	// Mouse interactions
+	function mouse(element,options) {
+		var event;
+		options=options||{};
+		options.button=options.button||1;
+		options.view=options.view||window;
+		options.altKey = !!options.altKey;
+		options.ctrlKey = !!options.ctrlKey;
+		options.shiftKey = !!options.shiftKey;
+		options.metaKey = !!options.metaKey;
+		try {
+			event = new MouseEvent('click', {
+				'view': window,
+				'bubbles': options.canBubble ? false : true,
+				'cancelable': options.cancelable ? false : true
+		  });
+			event.altKey = options.altKey;
+			event.ctrlKey = options.ctrlKey;
+			event.shiftKey = options.shiftKey;
+			event.metaKey = options.metaKey;
+		} catch(e) {
+			event = document.createEvent('MouseEvent');
+			event.initMouseEvent(options.type||'click',
+				'false' === options.canBubble ? false : true,
+				'false' === options.cancelable ? false : true,
+				options.view,
+				options.detail||1,
+				options.screenX||0, options.screenY||0,
+				options.clientX||0, options.clientY||0,
+				options.ctrlKey, options.altKey,
+				options.shiftKey, options.metaKey,
+				options.button,
+				options.relatedTarget||element);
+		}
+		// Chromium Hack
+		Object.defineProperty(event, 'which', {
+			get : function() {
+				return options.button;
+			}
+		});
 		element.dispatchEvent(event);
 	}
 
@@ -30,10 +66,13 @@
 		mouse(element, options);
 	}
 
+	// Tactile interactions
 	function tactile(element,options) {
 		options=options||{};
 		var event = document.createEvent('UIEvent');
-		event.initUIEvent(options.type, true, true);
+		event.initUIEvent(options.type,
+			'false' === options.canBubble ? false : true,
+			'false' === options.cancelable ? false : true);
 		event.view = options.view||window;
 		event.altKey = !!options.altKey;
 		event.ctrlKey = !!options.ctrlKey;
@@ -50,6 +89,7 @@
 		tactile(element, options);
 	}
 
+	// Keyboard interactions
 	function keyboard(element,options) {
 		options=options||{};
 		var event = document.createEvent('KeyboardEvent');
@@ -58,6 +98,8 @@
 		options.altKey = options.altKey|false
 		options.shiftKey = options.shiftKey|false
 		options.metaKey = options.metaKey|false;
+		options.keyCode = options.keyCode|0;
+		options.charCode = options.charCode|0;
 		// Chromium Hack
 		Object.defineProperty(event, 'keyCode', {
 			get : function() {
@@ -69,6 +111,16 @@
 				return options.keyCode|0;
 			}
 		});
+		Object.defineProperty(event, 'charCode', {
+			get : function() {
+				return options.charCode|'';
+			}
+		});
+		Object.defineProperty(event, 'char', {
+			get : function() {
+				return String.fromCharCode(options.charCode);
+			}
+		});
 		Object.defineProperty(event, 'ctrlKey', {
 			get : function() {
 				return options.ctrlKey;
@@ -78,11 +130,10 @@
 			? "initKeyboardEvent" : "initKeyEvent"](options.type,
 			'false' === options.canBubble ? false : true,
 			'false' === options.cancelable ? false : true,
-			options.view||window, options.char|'',
-			options.charCode|0, options.keyCode|0,
+			options.view||window, String.fromCharCode(options.charCode),
+			options.charCode, options.keyCode,
 			options.location|0, options.modifier|'',
 			options.repeat|false, options.locale|'');
-		event.keyCodeVal=options.keyCode|0;
 		event.ctrlKey=options.ctrlKey;
 		event.shiftKey=options.shiftKey;
 		event.altKey=options.altKey;
@@ -94,11 +145,20 @@
 		options=options||{};
 		options.type='keydown';
 		keyboard(element, options);
+		if(options.keyCode&&String.fromCharCode(options.keyCode)
+			&&('TEXTAREA'===element.nodeName
+			||('INPUT'===element.nodeName&&element.hasAttribute('type')
+				&&'text'===element.getAttribute('type')))) {
+			element.value+=String.fromCharCode(options.keyCode);
+		}
 		options.type='keyup';
+		keyboard(element, options);
+		options.type='keypress';
 		keyboard(element, options);
 	}
 
 	var EventSimulator = {
+		event:event,
 		mouse:mouse,
 		click:click,
 		tactile:tactile,

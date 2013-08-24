@@ -7,14 +7,16 @@
 	
 	// Creating markup
 	var div=document.createElement('div');
-	div.innerHTML='<form action="app:test?param1=val1&param2=val2">'
+	div.innerHTML='<form action="app:test?param1=val1&param2=val2" data-change="app:test?param5=val5&param6=val6">'
 		+'<input type="text" name="text" />'
-		+'<input type="submit" formaction="app:test?param3=val3&param4=val4" />'
-		+'<input type="submit" />'
+		+'<textarea></textarea>'
+		+'<select><option value="A">A</option><option value="B">B</option></select>'
+		+'<input type="checkbox" value="C" />'
 		+'</form>';
 	var cmdMgr=new Commandor(div);
 	var runResult=null;
 	function testCommand() {
+		console.log('Runned.');
 		var n=runResult&&runResult.n||0;
 		runResult=Array.prototype.slice.call(arguments,0);
 		runResult.n=++n;
@@ -22,90 +24,108 @@
 	cmdMgr.suscribe('test',testCommand);
 	document.body.appendChild(div);
 
+	var textInput=document.querySelector('input[type="text"]');
+	var textarea=document.querySelector('textarea');
+	var selectInput=document.querySelector('select');
+	var checkboxInput=document.querySelector('input[type="checkbox"]');
+
 	// Tests
-	describe('Input text should fire form change command', function(){
+	describe('Text inputs should fire form change command', function(){
 
-
-		var submitButton=document.querySelectorAll('input[type="submit"]')[1];
-		var actionButton=document.querySelector('input[type="submit"]');
-		
-		// Simple submit button
-		it('when clicking a submit button', function() {
+		it('when typing content in', function() {
 			runResult=null;
-			hlp.click(submitButton);
+			textInput.focus();
+			hlp.type(textInput,{charCode:65, keyCode:65});
+			hlp.event(textInput,{type:'input'});
+			hlp.type(textInput,{charCode:65, keyCode:65});
+			hlp.event(textInput,{type:'input'});
+			selectInput.focus();
+			hlp.event(textInput,{type:'change'});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
-			if('val1'!==runResult[1].param1
-				||'val2'!==runResult[1].param2) {
+			if('val5'!==runResult[1].param5
+				||'val6'!==runResult[1].param6) {
 				throw 'Bad params !';
 			}
 		});
 
-		if(!!('ontouchstart' in window)) {
-			it('when touching a submit button', function() {
-				runResult=null;
-				hlp.touch(submitButton);
-				if(null===runResult) {
-					throw 'Not well executed';
-				}
-				if('val1'!==runResult[1].param1
-					||'val2'!==runResult[1].param2) {
-					throw 'Bad params !';
-				}
-			});
-		}
+	});
 
-		it('when pressing enter key on a submit button', function() {
+	describe('Textareas should fire form change command', function(){
+
+		it('when typing content in', function() {
 			runResult=null;
-			submitButton.focus();
-			hlp.keyboard(submitButton,{type:'keyup',keyCode:13});
+			textInput.focus();
+			hlp.type(textarea,{charCode:65, keyCode:65});
+			hlp.event(textarea,{type:'input'});
+			hlp.type(textarea,{charCode:65, keyCode:65});
+			hlp.event(textarea,{type:'input'});
+			selectInput.focus();
+			hlp.event(textarea,{type:'change'});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
-			if('val1'!==runResult[1].param1
-				||'val2'!==runResult[1].param2) {
-				throw 'Bad params !';
-			}
-		});
-		
-		// Submit button with formaction
-		it('when clicking a submit button with formaction', function() {
-			runResult=null;
-			hlp.click(actionButton);
-			if(null===runResult) {
-				throw 'Not well executed';
-			}
-			if('val3'!==runResult[1].param3
-				||'val4'!==runResult[1].param4) {
+			if('val5'!==runResult[1].param5
+				||'val6'!==runResult[1].param6) {
 				throw 'Bad params !';
 			}
 		});
 
-		if(!!('ontouchstart' in window)) {
-			it('when touching a submit button with formaction', function() {
-				runResult=null;
-				hlp.touch(actionButton);
-				if(null===runResult) {
-					throw 'Not well executed';
-				}
-				if('val3'!==runResult[1].param3
-					||'val4'!==runResult[1].param4) {
-					throw 'Bad params !';
-				}
-			});
-		}
+	});
 
-		it('when pressing enter key on a submit button with formaction', function() {
+	describe('Selects should fire form change command', function(){
+
+		it('when selecting another item', function() {
 			runResult=null;
-			submitButton.focus();
-			hlp.keyboard(actionButton,{type:'keyup',keyCode:13});
+			selectInput.focus();
+			selectInput.value='B';
+			checkboxInput.focus();
+			hlp.event(textarea,{type:'select'});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
-			if('val3'!==runResult[1].param3
-				||'val4'!==runResult[1].param4) {
+			if('val5'!==runResult[1].param5
+				||'val6'!==runResult[1].param6) {
 				throw 'Bad params !';
+			}
+		});
+
+	});
+
+	describe('Checkboxes should fire form change command', function(){
+
+		it('when changing their state to checked', function() {
+			runResult=null;
+			checkboxInput.focus();
+			hlp.click(checkboxInput);
+			textInput.focus();
+			if(null===runResult) {
+				throw 'Not well executed';
+			}
+			if('val5'!==runResult[1].param5
+				||'val6'!==runResult[1].param6) {
+				throw 'Bad params !';
+			}
+			if(!checkboxInput.checked) {
+				throw 'Checkbox isn\'t checked';
+			}
+		});
+
+		it('when changing their state to unchecked', function() {
+			runResult=null;
+			checkboxInput.focus();
+			hlp.click(checkboxInput);
+			textInput.focus();
+			if(null===runResult) {
+				throw 'Not well executed';
+			}
+			if('val5'!==runResult[1].param5
+				||'val6'!==runResult[1].param6) {
+				throw 'Bad params !';
+			}
+			if(checkboxInput.checked) {
+				throw 'Checkbox is still checked';
 			}
 		});
 

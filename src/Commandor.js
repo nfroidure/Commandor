@@ -131,7 +131,7 @@
 	};
 
 	// Extract the command for a button
-	Commandor.prototype.doCommandOfButton=function(element) {
+	Commandor.prototype.doCommandOfButton=function(element, event) {
 		var command='';
 		// looking for a button with formaction attribute
 		if('INPUT'===element.nodeName) {
@@ -152,7 +152,7 @@
 			// if the button is not disabled, run the command
 			if((!element.hasAttribute('disabled'))
 				||'disabled'===element.getAttribute('disabled')) {
-				this.doCommandOfButton(element);
+				this.doCommandOfButton(element, event);
 			}
 			event.stopPropagation()||event.preventDefault();
 		}
@@ -172,7 +172,7 @@
 	};
 
 	// Extract the command for a button
-	Commandor.prototype.doCommandOfForm=function(element) {
+	Commandor.prototype.doCommandOfForm=function(element, event) {
 		var command='';
 		// looking for a button with formaction attribute
 		if('FORM'===element.nodeName) {
@@ -190,7 +190,7 @@
 			// if the button is not disabled, run the command
 			if((!element.hasAttribute('disabled'))
 				||'disabled'===element.getAttribute('disabled')) {
-				this.doCommandOfForm(element);
+				this.doCommandOfForm(element, event);
 			}
 			event.stopPropagation()||event.preventDefault();
 		}
