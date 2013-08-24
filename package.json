@@ -12,10 +12,11 @@
 	},
 	"dependencies": {},
 	"devDependencies": {
-		"mocha": "~1.7.0",
+		"mocha": "~0.1.0",
 		"karma": "~0.10.1",
+		"karma-mocha": "~0.10.1",
 		"karma-slimerjs-launcher": "~0.1.1",
-		"requirejs": "*"
+		"karma-requirejs": "~0.1.0"
 	},
 	"scripts": {
 		"test": "karma start karma.conf.js --single-run --browsers SlimerJS"
