@@ -7,6 +7,7 @@ before_script:
   - echo $PATH
   - echo $SLIMERJSLAUNCHER
   - ls
+  - ls "$(pwd)/slimerjs-0.8.2"
   - pwd
 node_js:
   - 0.8
