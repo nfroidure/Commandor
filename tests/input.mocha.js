@@ -7,7 +7,7 @@
 	
 	// Creating markup
 	var div=document.createElement('div');
-	div.innerHTML='<form action="app:test?param1=val1&param2=val2" data-change="app:test?param5=val5&param6=val6">'
+	div.innerHTML='<form action="app:inputtest?param1=val1&param2=val2" data-change="app:inputtest?param5=val5&param6=val6">'
 		+'<input type="text" name="text" />'
 		+'<textarea></textarea>'
 		+'<select><option value="A">A</option><option value="B">B</option></select>'
@@ -20,13 +20,13 @@
 		runResult=Array.prototype.slice.call(arguments,0);
 		runResult.n=++n;
 	}
-	cmdMgr.suscribe('test',testCommand);
+	cmdMgr.suscribe('inputtest',testCommand);
 	document.body.appendChild(div);
 
-	var textInput=document.querySelector('input[type="text"]');
-	var textarea=document.querySelector('textarea');
-	var selectInput=document.querySelector('select');
-	var checkboxInput=document.querySelector('input[type="checkbox"]');
+	var textInput=div.getElementsByTagName('input')[0];
+	var textarea=div.getElementsByTagName('textarea')[0];
+	var selectInput=div.getElementsByTagName('select')[0];
+	var checkboxInput=div.getElementsByTagName('input')[1];
 
 	// Tests
 	describe('Text inputs should fire form change command', function(){

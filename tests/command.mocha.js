@@ -14,9 +14,9 @@
 			runResult=Array.prototype.slice.call(arguments,0);
 			runResult.n=++n;
 		}
-		cmdMgr.suscribe('test',testCommand);
+		cmdMgr.suscribe('commandtest',testCommand);
 		var a=document.createElement('a');
-		a.setAttribute('href','app:test?param1=val1&param2=val2');
+		a.setAttribute('href','app:commandtest?param1=val1&param2=val2');
 		var span=document.createElement('span');
 		span.appendChild(document.createTextNode('test'));
 		a.appendChild(span);

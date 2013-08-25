@@ -3,14 +3,46 @@
 (function(root,define){ define([], function() {
 // START: Module logic start
 
+	// Bind polyfill : from MDN
+	if (!Function.prototype.bind) {
+		Function.prototype.bind = function (oThis) {
+		  if (typeof this !== "function") {
+		    // closest thing possible to the ECMAScript 5 internal IsCallable function
+		    throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+		  }
+
+		  var aArgs = Array.prototype.slice.call(arguments, 1), 
+		      fToBind = this, 
+		      fNOP = function () {},
+		      fBound = function () {
+		        return fToBind.apply(this instanceof fNOP && oThis
+		                               ? this
+		                               : oThis,
+		                             aArgs.concat(Array.prototype.slice.call(arguments)));
+		      };
+
+		  fNOP.prototype = this.prototype;
+		  fBound.prototype = new fNOP();
+
+		  return fBound;
+		};
+	}
+
 	// Generic event
 	function event(element,options) {
+		var event;
 		options=options||{};
-		var event = document.createEvent('Event');
-		event.initEvent(options.type,
-			'false' === options.canBubble ? false : true,
-			'false' === options.cancelable ? false : true);
-		element.dispatchEvent(event);
+		if(document.createEvent) {
+			event = document.createEvent('Event');
+			event.initEvent(options.type,
+				'false' === options.canBubble ? false : true,
+				'false' === options.cancelable ? false : true);
+			element.dispatchEvent(event);
+		} else if(document.createEventObject) {
+			event = document.createEventObject();
+			event.eventType=options.type;
+      element.fireEvent('on'+options.type, event);
+		}
 	}
 
 	// Mouse interactions
@@ -23,37 +55,49 @@
 		options.ctrlKey = !!options.ctrlKey;
 		options.shiftKey = !!options.shiftKey;
 		options.metaKey = !!options.metaKey;
-		try {
-			event = new MouseEvent('click', {
-				'view': window,
-				'bubbles': options.canBubble ? false : true,
-				'cancelable': options.cancelable ? false : true
-		  });
-			event.altKey = options.altKey;
-			event.ctrlKey = options.ctrlKey;
-			event.shiftKey = options.shiftKey;
-			event.metaKey = options.metaKey;
-		} catch(e) {
-			event = document.createEvent('MouseEvent');
-			event.initMouseEvent(options.type||'click',
-				'false' === options.canBubble ? false : true,
-				'false' === options.cancelable ? false : true,
-				options.view,
-				options.detail||1,
-				options.screenX||0, options.screenY||0,
-				options.clientX||0, options.clientY||0,
-				options.ctrlKey, options.altKey,
-				options.shiftKey, options.metaKey,
-				options.button,
-				options.relatedTarget||element);
-		}
-		// Chromium Hack
-		Object.defineProperty(event, 'which', {
-			get : function() {
-				return options.button;
+		if(document.createEvent) {
+			try {
+				event = new MouseEvent('click', {
+					'view': window,
+					'bubbles': options.canBubble ? false : true,
+					'cancelable': options.cancelable ? false : true
+				});
+				event.altKey = options.altKey;
+				event.ctrlKey = options.ctrlKey;
+				event.shiftKey = options.shiftKey;
+				event.metaKey = options.metaKey;
+			} catch(e) {
+				event = document.createEvent('MouseEvent');
+				event.initMouseEvent(options.type||'click',
+					'false' === options.canBubble ? false : true,
+					'false' === options.cancelable ? false : true,
+					options.view,
+					options.detail||1,
+					options.screenX||0, options.screenY||0,
+					options.clientX||0, options.clientY||0,
+					options.ctrlKey, options.altKey,
+					options.shiftKey, options.metaKey,
+					options.button,
+					options.relatedTarget||element);
 			}
-		});
-		element.dispatchEvent(event);
+			// Chromium Hack
+			try {
+				Object.defineProperty(event, 'which', {
+					get : function() {
+						return options.button;
+					}
+				});
+			} catch(e) {
+				console.log(e);
+				event.wich=options.button;
+			}
+			element.dispatchEvent(event);
+		} else if(document.createEventObject) {
+			event = document.createEventObject();
+			event.eventType=options.type;
+			event.button=options.button;
+      element.fireEvent('on'+options.type, event);
+		}
 	}
 
 	function click(element,options) {
@@ -124,8 +168,8 @@
 
 	// Keyboard interactions
 	function keyboard(element,options) {
+		var event;
 		options=options||{};
-		var event = document.createEvent('KeyboardEvent');
 		// Defaults
 		options.ctrlKey = options.ctrlKey|false
 		options.altKey = options.altKey|false
@@ -133,49 +177,63 @@
 		options.metaKey = options.metaKey|false;
 		options.keyCode = options.keyCode|0;
 		options.charCode = options.charCode|0;
-		event[typeof event.initKeyboardEvent !== 'undefined'
-			? "initKeyboardEvent" : "initKeyEvent"](options.type,
-			'false' === options.canBubble ? false : true,
-			'false' === options.cancelable ? false : true,
-			options.view||window, String.fromCharCode(options.charCode),
-			options.charCode, options.keyCode,
-			options.location|0, options.modifier|'',
-			options.repeat|false, options.locale|'');
-		event.ctrlKey=options.ctrlKey;
-		event.shiftKey=options.shiftKey;
-		event.altKey=options.altKey;
-		event.metaKey=options.metaKey;
-		// Chromium Hack
-		try {
-			Object.defineProperty(event, 'keyCode', {
-				get : function() {
-					return options.keyCode|0;
-				}
-			});
-			Object.defineProperty(event, 'which', {
-				get : function() {
-					return options.keyCode|0;
-				}
-			});
-			Object.defineProperty(event, 'charCode', {
-				get : function() {
-					return options.charCode|'';
-				}
-			});
-			Object.defineProperty(event, 'char', {
-				get : function() {
-					return String.fromCharCode(options.charCode);
-				}
-			});
-			Object.defineProperty(event, 'ctrlKey', {
-				get : function() {
-					return options.ctrlKey;
-				}
-			});
-		} catch(e) {
-		
+		if(document.createEvent) {
+			event = document.createEvent('KeyboardEvent');
+			event[typeof event.initKeyboardEvent !== 'undefined'
+				? "initKeyboardEvent" : "initKeyEvent"](options.type,
+				'false' === options.canBubble ? false : true,
+				'false' === options.cancelable ? false : true,
+				options.view||window, String.fromCharCode(options.charCode),
+				options.charCode, options.keyCode,
+				options.location|0, options.modifier|'',
+				options.repeat|false, options.locale|'');
+			event.ctrlKey=options.ctrlKey;
+			event.shiftKey=options.shiftKey;
+			event.altKey=options.altKey;
+			event.metaKey=options.metaKey;
+			// Chromium Hack
+			try {
+				Object.defineProperty(event, 'keyCode', {
+					get : function() {
+						return options.keyCode|0;
+					}
+				});
+				Object.defineProperty(event, 'which', {
+					get : function() {
+						return options.keyCode|0;
+					}
+				});
+				Object.defineProperty(event, 'charCode', {
+					get : function() {
+						return options.charCode|'';
+					}
+				});
+				Object.defineProperty(event, 'char', {
+					get : function() {
+						return String.fromCharCode(options.charCode);
+					}
+				});
+				Object.defineProperty(event, 'ctrlKey', {
+					get : function() {
+						return options.ctrlKey;
+					}
+				});
+			} catch(e) {
+				event.keyCode=options.keyCode;
+				event.wich=options.keyCode;
+				event.charCode=options.charCode;
+				event.char=String.fromCharCode(options.charCode);
+				event.ctrlKey=options.ctrlKey;
+				console.log(e);
+			}
+			element.dispatchEvent(event);
+		} else if(document.createEventObject) {
+			event = document.createEventObject();
+			event.eventType=options.type;
+			event.keyCode=options.keyCode;
+			event.charCode=options.charCode;
+      element.fireEvent('on'+options.type, event);
 		}
-		element.dispatchEvent(event);
 	}
 
 	function type(element,options) {
@@ -203,7 +261,7 @@
 		tactile:tactile,
 		touch:touch,
 		keyboard:keyboard,
-		type:type,
+		type:type
 	};
 
 // END: Module logic end

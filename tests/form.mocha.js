@@ -7,8 +7,8 @@
 	describe('Submit forms should work', function(){
 
 		var div=document.createElement('div');
-		div.innerHTML='<form action="app:test?param1=val1&param2=val2">'
-			+'<input type="submit" formaction="app:test?param3=val3&param4=val4" />'
+		div.innerHTML='<form action="app:formtest?param1=val1&param2=val2">'
+			+'<input type="submit" formaction="app:formtest?param3=val3&param4=val4" />'
 			+'<input type="submit" />'
 			+'</form>';
 		var cmdMgr=new Commandor(div);
@@ -18,10 +18,10 @@
 			runResult=Array.prototype.slice.call(arguments,0);
 			runResult.n=++n;
 		}
-		cmdMgr.suscribe('test',testCommand);
+		cmdMgr.suscribe('formtest',testCommand);
 		document.body.appendChild(div);
-		var submitButton=document.querySelectorAll('input[type="submit"]')[1];
-		var actionButton=document.querySelector('input[type="submit"]');
+		var submitButton=div.getElementsByTagName('input')[1];
+		var actionButton=div.getElementsByTagName('input')[0];
 		
 		// Simple submit button
 		it('when clicking a submit button', function() {

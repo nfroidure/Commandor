@@ -44,7 +44,7 @@
 					}
 				}.bind(this),true);
 		} else {
-			// Webkit touch events
+			// Touch events
 			if(!!('ontouchstart' in window)) {
 				(function() {
 					// a var keepin' the touchstart element
@@ -123,6 +123,26 @@
 
 	// Look for a form
 	Commandor.prototype.findForm=function(element) {
+		if('FORM'===element.nodeName||
+			('INPUT'===element.nodeName&&element.hasAttribute('type')
+			&&'submit'===element.getAttribute('type'))) {
+			while(element&&element.parentNode) {
+				if('FORM'===element.nodeName&&element.hasAttribute('action')
+					&&-1!==element.getAttribute('action').indexOf('app:')) {
+					return element;
+				}
+				if(element===this.rootElement) {
+					return null;
+				}
+				element=element.parentNode;
+			}
+			return element;
+		}
+		return null;
+	};
+
+	// Look for form change
+	Commandor.prototype.findFormChange=function(element) {
 		while(element&&element.parentNode) {
 			if('FORM'===element.nodeName&&element.hasAttribute('action')
 				&&-1!==element.getAttribute('action').indexOf('app:')) {
@@ -167,7 +187,7 @@
 	// Form change handler
 	Commandor.prototype.formChange=function(event) {
 		// find the evolved form
-		var element=this.findForm(event.target),
+		var element=this.findFormChange(event.target),
 			command='';
 		// searching the data-change attribute containing the command
 		if('FORM'===element.nodeName&&element.hasAttribute('data-change')) {
