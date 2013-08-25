@@ -16,6 +16,7 @@
 		"karma": "~0.10.1",
 		"karma-mocha": "~0.1.0",
 		"karma-firefox-launcher": "~0.1",
+		"karma-slimerjs-launcher": "0.1.2",
 		"karma-requirejs": "~0.1.0"
 	},
 	"scripts": {
