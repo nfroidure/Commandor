@@ -19,7 +19,7 @@
 		"karma-requirejs": "~0.1.0"
 	},
 	"scripts": {
-		"test": "karma start karma.conf.js --single-run --browsers SlimerJS"
+		"test": "karma start karma.conf.js --single-run"
 	},
 	"keywords": [
 		"command",

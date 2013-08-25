@@ -56,7 +56,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['Chrome', 'Firefox'],
+    browsers: process.env.TRAVIS ? ['Firefox'] : ['Chrome', 'PhantomJS', 'SlimerJS', 'Firefox', 'Opera'],
 
 
     // If browser does not capture in given timeout [ms], kill it
