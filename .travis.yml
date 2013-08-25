@@ -6,8 +6,9 @@ before_script:
   - PATH="$PATH:$(pwd)/slimerjs-0.8.2"
   - echo $PATH
   - echo $SLIMERJSLAUNCHER
-  - ls
-  - ls "$(pwd)/slimerjs-0.8.2"
+  - ls -la 
+  - ls -la "$(pwd)/slimerjs-0.8.2"
+  - chmod 777 $(pwd)/slimerjs-0.8.2/slimerjs
   - pwd
 node_js:
   - 0.8
