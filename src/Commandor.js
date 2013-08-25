@@ -50,13 +50,15 @@
 					// a var keepin' the touchstart element
 					var curElement=null;
 					this.rootElement.addEventListener('touchstart', function(event) {
-						curElement=this.findButton(event.target);
+						curElement=this.findButton(event.target)||this.findForm(event.target);
 						curElement&&event.preventDefault()||event.stopPropagation();
 					}.bind(this),true);
 					// checking it's the same at touchend, capturing command if so
 					this.rootElement.addEventListener('touchend', function(event) {
 						if(curElement==this.findButton(event.target)) {
 							this.captureButton(event);
+						} else if(curElement===this.findForm(event.target)) {
+							this.captureForm(event);
 						} else {
 							curElement=null;
 						}
@@ -217,7 +219,7 @@
 			callback=callback[nodes[i]];
 		}
 		// Preparing arguments
-		var args=[];
+		var args={};
 		if(chunks[1]) {
 			chunks=chunks[1].split('&');
 			for(var i=0, j=chunks.length; i<j; i++) {

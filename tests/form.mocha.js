@@ -14,7 +14,6 @@
 		var cmdMgr=new Commandor(div);
 		var runResult=null;
 		function testCommand() {
-			console.log('Runned.');
 			var n=runResult&&runResult.n||0;
 			runResult=Array.prototype.slice.call(arguments,0);
 			runResult.n=++n;

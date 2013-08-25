@@ -103,7 +103,9 @@
 		var event = document.createEvent('UIEvent');
 		event.initUIEvent(options.type,
 			'false' === options.canBubble ? false : true,
-			'false' === options.cancelable ? false : true);
+			'false' === options.cancelable ? false : true,
+			options.view||window,
+			options.detail||1);
 		event.view = options.view||window;
 		event.altKey = !!options.altKey;
 		event.ctrlKey = !!options.ctrlKey;
@@ -131,32 +133,6 @@
 		options.metaKey = options.metaKey|false;
 		options.keyCode = options.keyCode|0;
 		options.charCode = options.charCode|0;
-		// Chromium Hack
-		Object.defineProperty(event, 'keyCode', {
-			get : function() {
-				return options.keyCode|0;
-			}
-		});
-		Object.defineProperty(event, 'which', {
-			get : function() {
-				return options.keyCode|0;
-			}
-		});
-		Object.defineProperty(event, 'charCode', {
-			get : function() {
-				return options.charCode|'';
-			}
-		});
-		Object.defineProperty(event, 'char', {
-			get : function() {
-				return String.fromCharCode(options.charCode);
-			}
-		});
-		Object.defineProperty(event, 'ctrlKey', {
-			get : function() {
-				return options.ctrlKey;
-			}
-		});
 		event[typeof event.initKeyboardEvent !== 'undefined'
 			? "initKeyboardEvent" : "initKeyEvent"](options.type,
 			'false' === options.canBubble ? false : true,
@@ -169,6 +145,36 @@
 		event.shiftKey=options.shiftKey;
 		event.altKey=options.altKey;
 		event.metaKey=options.metaKey;
+		// Chromium Hack
+		try {
+			Object.defineProperty(event, 'keyCode', {
+				get : function() {
+					return options.keyCode|0;
+				}
+			});
+			Object.defineProperty(event, 'which', {
+				get : function() {
+					return options.keyCode|0;
+				}
+			});
+			Object.defineProperty(event, 'charCode', {
+				get : function() {
+					return options.charCode|'';
+				}
+			});
+			Object.defineProperty(event, 'char', {
+				get : function() {
+					return String.fromCharCode(options.charCode);
+				}
+			});
+			Object.defineProperty(event, 'ctrlKey', {
+				get : function() {
+					return options.ctrlKey;
+				}
+			});
+		} catch(e) {
+		
+		}
 		element.dispatchEvent(event);
 	}
 
