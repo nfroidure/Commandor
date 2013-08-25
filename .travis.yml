@@ -2,6 +2,8 @@ language: node_js
 before_script:
   - wget http://download.slimerjs.org/v0.8/slimerjs-0.8.2-linux-i686.tar.bz2
   - tar -jxf slimerjs-0.8.2-linux-i686.tar.bz2
-script: env SLIMERJS_BIN="slimerjs-0.8.2/slimerjs" karma start karma.conf.js --single-run --browsers SlimerJS
+  - $(pwd)/slimerjs-0.8.2/slimerjs
+  
+script: env PATH="$PATH:$(pwd)/slimerjs-0.8.2/" karma start karma.conf.js --single-run --browsers SlimerJS
 node_js:
   - 0.8
