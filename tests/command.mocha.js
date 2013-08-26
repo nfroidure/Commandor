@@ -75,6 +75,10 @@
 			}
 		});
 
+		it('until it is disposed', function() {
+			cmdMgr.dispose();
+		});
+
 	});
 
 // END: Module logic end

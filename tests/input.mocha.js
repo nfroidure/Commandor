@@ -143,6 +143,47 @@
 			}
 		});
 
+		it('until it is disposed', function() {
+			cmdMgr.dispose();
+		});
+
+	});
+
+	describe('Disposed text inputs should not work', function() {
+
+		it('when suscribing commands', function() {
+			try {
+				cmdMgr.suscribe('test', function() { console.log('')});
+				throw Error('Suscribing disposed cmdMgr did not send an error.');
+			} catch(e) {
+				if('Suscribing dispose cmdMgr did not send an error.'===e.message) {
+					throw e;
+				}
+			}
+		});
+
+		it('when unsuscribing commands', function() {
+			try {
+				cmdMgr.unsuscribe('test', function() { console.log('')});
+				throw Error('Unsuscribing disposed cmdMgr did not send an error.');
+			} catch(e) {
+				if('Unsuscribing dispose cmdMgr did not send an error.'===e.message) {
+					throw e;
+				}
+			}
+		});
+
+		it('when executing commands', function() {
+			try {
+				cmdMgr.executeCommand({}, 'test', textInput);
+				throw Error('Suscribing disposed cmdMgr did not send an error.');
+			} catch(e) {
+				if('Suscribing dispose cmdMgr did not send an error.'===e.message) {
+					throw e;
+				}
+			}
+		});
+
 	});
 
 // END: Module logic end

@@ -6,11 +6,18 @@
 	// Commandor constructor : rootElement is the element
 	// from wich we capture commands
 	var Commandor=function Commandor(rootElement) {
+		// event handlers
+		var _pointerDownListener, _pointerUpListener, _pointerClickListener,
+			_touchstartListener, _touchendListener, _clickListener,
+			_keydownListener, _keyupListener,
+			_formChangeListener, _formSubmitListener,
+		// Commands hashmap
+			_commands={};
+		;
+		// Testing rootElement
 		if(!rootElement) {
 			throw Error('No rootElement given');
 		}
-		// Commands hashmap
-		this.commands={};
 		// keeping a reference to the rootElement
 		this.rootElement=rootElement;
 		// MS Pointer events : should unify pointers, but... read and see by yourself. 
@@ -18,11 +25,11 @@
 			// event listeners for buttons
 			(function() {
 				var curElement=null;
-				this.rootElement.addEventListener('MSPointerDown', function(event) {
+				_pointerDownListener=function(event) {
 					curElement=this.findButton(event.target)||this.findForm(event.target);
 					curElement&&event.preventDefault()||event.stopPropagation();
-				}.bind(this),true);
-				this.rootElement.addEventListener('MSPointerUp', function(event) {
+				}.bind(this);
+				_pointerUpListener=function(event) {
 					if(curElement) {
 						if(curElement===this.findButton(event.target)) {
 							this.captureButton(event);
@@ -32,29 +39,32 @@
 						event.preventDefault(); event.stopPropagation();
 						curElement=null;
 					}
-				}.bind(this),true);
+				}.bind(this);
+				this.rootElement.addEventListener('MSPointerDown', _pointerDownListener, true);
+				this.rootElement.addEventListener('MSPointerUp', _pointerUpListener, true);
 			}).call(this);
 			// fucking IE10 bug : it doesn't cancel click event
 			// when gesture events are cancelled
-			this.rootElement.addEventListener('click',
-				function(event){
+			_pointerClickListener=function(event){
 					if(this.findButton(event.target)) {
 						event.preventDefault();
 						event.stopPropagation();
 					}
-				}.bind(this),true);
+				}.bind(this);
+			this.rootElement.addEventListener('click',_pointerClickListener,true);
 		} else {
 			// Touch events
 			if(!!('ontouchstart' in window)) {
 				(function() {
 					// a var keepin' the touchstart element
 					var curElement=null;
-					this.rootElement.addEventListener('touchstart', function(event) {
+					_touchstartListener=function(event) {
 						curElement=this.findButton(event.target)||this.findForm(event.target);
 						curElement&&event.preventDefault()||event.stopPropagation();
-					}.bind(this),true);
+					}.bind(this);
+					this.rootElement.addEventListener('touchstart', _touchstartListener, true);
 					// checking it's the same at touchend, capturing command if so
-					this.rootElement.addEventListener('touchend', function(event) {
+					_touchendListener=function(event) {
 						if(curElement==this.findButton(event.target)) {
 							this.captureButton(event);
 						} else if(curElement===this.findForm(event.target)) {
@@ -62,39 +72,129 @@
 						} else {
 							curElement=null;
 						}
-					}.bind(this),true);
+					}.bind(this);
+					this.rootElement.addEventListener('touchend', _touchendListener,true);
 				}).call(this);
 			}
 		// Clic events
-		this.rootElement.addEventListener('click',
-			this.captureButton.bind(this),true);
+		_clickListener=this.captureButton.bind(this);
+		this.rootElement.addEventListener('click', _clickListener, true);
 		}
-	// Keyboard events
-	// Cancel keydown action (no click event)
-	this.rootElement.addEventListener('keydown',function(event) {
-		if(13===event.keyCode&&(this.findButton(event.target)
-			||this.findForm(event.target))) {
-			event.preventDefault()&&event.stopPropagation();
-		}
-	}.bind(this),true);
-	// Fire on keyup
-	this.rootElement.addEventListener('keyup',function(event) {
-		if(13===event.keyCode&&!event.ctrlKey) {
-			if(this.findButton(event.target)) {
-				this.captureButton.apply(this, arguments);
-			} else {
-				this.captureForm.apply(this, arguments);
+		// Keyboard events
+		// Cancel keydown action (no click event)
+		_keydownListener=function(event) {
+			if(13===event.keyCode&&(this.findButton(event.target)
+				||this.findForm(event.target))) {
+				event.preventDefault()&&event.stopPropagation();
 			}
-		}
-	}.bind(this),true);
-	// event listeners for forms submission
-	this.rootElement.addEventListener('submit',
-		this.captureForm.bind(this),true);
-	// event listeners for form changes
-	this.rootElement.addEventListener('change',
-		this.formChange.bind(this),true);
-	this.rootElement.addEventListener('select',
-		this.formChange.bind(this),true);
+		}.bind(this);
+		this.rootElement.addEventListener('keydown', _keydownListener, true);
+		// Fire on keyup
+		_keyupListener=function(event) {
+			if(13===event.keyCode&&!event.ctrlKey) {
+				if(this.findButton(event.target)) {
+					this.captureButton.apply(this, arguments);
+				} else {
+					this.captureForm.apply(this, arguments);
+				}
+			}
+		}.bind(this);
+		this.rootElement.addEventListener('keyup', _keyupListener, true);
+		// event listeners for forms submission
+		_formSubmitListener=this.captureForm.bind(this);
+		this.rootElement.addEventListener('submit', _formSubmitListener, true);
+		// event listeners for form changes
+		_formChangeListener=this.formChange.bind(this);
+		this.rootElement.addEventListener('change', _formChangeListener, true);
+		this.rootElement.addEventListener('select', _formChangeListener, true);
+
+		// Common command executor
+		this.executeCommand=function (event,command,element) {
+			if(!_commands) {
+				throw Error('Cannot execute command on a disposed Commandor object.');
+			}
+			// checking for the app protocol
+			if(0!==command.indexOf('app:'))
+				return false;
+			// removing app:
+			command=command.substr(4);
+			var chunks=command.split('?');
+			// the first chunk is the command path
+			var callback=_commands;
+			var nodes=chunks[0].split('/');
+			for(var i=0, j=nodes.length; i<j; i++) {
+			if(!callback[nodes[i]])
+				throw Error('Cannot execute the following command "'+command+'".');
+				callback=callback[nodes[i]];
+			}
+			// Preparing arguments
+			var args={};
+			if(chunks[1]) {
+				chunks=chunks[1].split('&');
+				for(var i=0, j=chunks.length; i<j; i++) {
+					var parts=chunks[i].split('=');
+					if(undefined!==parts[0]&&undefined!==parts[1])
+						args[parts[0]]=decodeURIComponent(parts[1]);
+				}
+			}
+			// executing the command fallback
+			return !!!callback(event,args,element);
+		};
+
+		// Add a callback for the specified path
+		this.suscribe=function(path,callback) {
+			if(!_commands) {
+				throw Error('Cannot suscribe commands on a disposed Commandor object.');
+			}
+			var nodes=path.split('/'),
+				command=_commands;
+			for(var i=0, j=nodes.length-1; i<j; i++) {
+				if((!command[nodes[i]])||!(command[nodes[i]] instanceof Object)) {
+
+					command[nodes[i]]={};
+					}
+				command=command[nodes[i]];
+				}
+			command[nodes[i]]=callback;
+		};
+
+		// Delete callback for the specified path
+		this.unsuscribe=function(path) {
+			if(!_commands) {
+				throw Error('Cannot unsuscribe commands of a disposed Commandor object.');
+			}
+			var nodes=path.split('/'),
+				command=_commands;
+			for(var i=0, j=nodes.length-1; i<j; i++) {
+				command=command[nodes[i]]={};
+			}
+			command[nodes[i]]=null;
+		};
+
+		// Dispose the commandor object (remove event listeners)
+		this.dispose=function() {
+			_commands=null;
+			if(_pointerDownListener) {
+				this.rootElement.removeEventListener('MSPointerDown',
+					_pointerDownListener, true);
+				this.rootElement.removeEventListener('MSPointerUp',
+					_pointerUpListener, true);
+				this.rootElement.removeEventListener('click',
+					_pointerClickListener, true);
+			}
+			if(_touchstartListener) {
+				this.rootElement.removeEventListener('touchstart',
+					_touchstartListener, true);
+				this.rootElement.removeEventListener('touchend',
+					_touchendListener, true);
+			}
+			this.rootElement.removeEventListener('click', _clickListener, true);
+			this.rootElement.removeEventListener('keydown', _keydownListener, true);
+			this.rootElement.removeEventListener('keyup', _keyupListener, true);
+			this.rootElement.removeEventListener('change', _formChangeListener, true);
+			this.rootElement.removeEventListener('select', _formChangeListener, true);
+			this.rootElement.removeEventListener('submit', _formSubmitListener, true);
+		};
 	}
 
 	// Look for a button
@@ -220,59 +320,6 @@
 			}
 			event.stopPropagation()||event.preventDefault();
 		}
-	};
-
-	// Common command executor
-	Commandor.prototype.executeCommand=function (event,command,element) {
-		// checking for the app protocol
-		if(0!==command.indexOf('app:'))
-			return false;
-		// removing app:
-		command=command.substr(4);
-		var chunks=command.split('?');
-		// the first chunk is the command path
-		var callback=this.commands;
-		var nodes=chunks[0].split('/');
-		for(var i=0, j=nodes.length; i<j; i++) {
-		if(!callback[nodes[i]])
-			throw Error('Cannot execute the following command "'+command+'".');
-			callback=callback[nodes[i]];
-		}
-		// Preparing arguments
-		var args={};
-		if(chunks[1]) {
-			chunks=chunks[1].split('&');
-			for(var i=0, j=chunks.length; i<j; i++) {
-				var parts=chunks[i].split('=');
-				if(undefined!==parts[0]&&undefined!==parts[1])
-					args[parts[0]]=decodeURIComponent(parts[1]);
-			}
-		}
-		// executing the command fallback
-		return !!!callback(event,args,element);
-	};
-
-	// Add a callback for the specified path
-	Commandor.prototype.suscribe=function(path,callback) {
-		var nodes=path.split('/'),
-			command=this.commands;
-		for(var i=0, j=nodes.length-1; i<j; i++) {
-			if((!command[nodes[i]])||!(command[nodes[i]] instanceof Object)) {
-				command[nodes[i]]={};
-				}
-			command=command[nodes[i]];
-			}
-		command[nodes[i]]=callback;
-	};
-
-	// Delete callback for the specified path
-	Commandor.prototype.unsuscribe=function(path) {
-		var nodes=path.split('/'),
-			command=this.commands;
-		for(var i=0, j=nodes.length-1; i<j; i++) {
-			command=command[nodes[i]]={};
-		}
-		command[nodes[i]]=null;
 	};
 
 // END: Module logic end
