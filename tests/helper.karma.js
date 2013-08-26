@@ -49,6 +49,7 @@
 	function mouse(element,options) {
 		var event;
 		options=options||{};
+		options.type=options.type||'click';
 		options.button=options.button||1;
 		options.view=options.view||window;
 		options.altKey = !!options.altKey;
@@ -57,7 +58,7 @@
 		options.metaKey = !!options.metaKey;
 		if(document.createEvent) {
 			try {
-				event = new MouseEvent('click', {
+				event = new MouseEvent(options.type, {
 					'view': window,
 					'bubbles': options.canBubble ? false : true,
 					'cancelable': options.cancelable ? false : true
@@ -88,15 +89,14 @@
 					}
 				});
 			} catch(e) {
-				console.log(e);
 				event.wich=options.button;
 			}
-			element.dispatchEvent(event);
+			return element.dispatchEvent(event);
 		} else if(document.createEventObject) {
 			event = document.createEventObject();
 			event.eventType=options.type;
 			event.button=options.button;
-      element.fireEvent('on'+options.type, event);
+      return element.fireEvent('on'+options.type, event);
 		}
 	}
 
@@ -104,9 +104,9 @@
 		options=options||{};
 		options.type='mousedown';
 		mouse(element, options);
-		options.type='click';
-		mouse(element, options);
 		options.type='mouseup';
+		mouse(element, options);
+		options.type='click';
 		mouse(element, options);
 	}
 
@@ -224,7 +224,6 @@
 				event.charCode=options.charCode;
 				event.char=String.fromCharCode(options.charCode);
 				event.ctrlKey=options.ctrlKey;
-				console.log(e);
 			}
 			element.dispatchEvent(event);
 		} else if(document.createEventObject) {

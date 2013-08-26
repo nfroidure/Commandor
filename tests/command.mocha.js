@@ -10,7 +10,7 @@
 		var cmdMgr=new Commandor(div);
 		var runResult=null;
 		function testCommand() {
-			var n=runResult&&runResult.n||0;
+		var n=runResult&&runResult.n?runResult.n:0;
 			runResult=Array.prototype.slice.call(arguments,0);
 			runResult.n=++n;
 		}
@@ -33,6 +33,9 @@
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
+			if(1!==runResult.n) {
+				throw 'Runned to many times ('+runResult.n+'/1).';
+			}
 			if('val1'!==runResult[1].param1
 				||'val2'!==runResult[1].param2) {
 				throw 'Bad params !';
@@ -45,6 +48,9 @@
 				hlp.touch(a);
 				if(null===runResult) {
 					throw 'Not well executed';
+				}
+				if(1!==runResult.n) {
+					throw 'Runned to many times ('+runResult.n+'/1).';
 				}
 				if('val1'!==runResult[1].param1
 					||'val2'!==runResult[1].param2) {
@@ -59,6 +65,9 @@
 			hlp.type(a,{keyCode:13});
 			if(null===runResult) {
 				throw 'Not well executed';
+			}
+			if(1!==runResult.n) {
+				throw 'Runned to many times ('+runResult.n+'/1).';
 			}
 			if('val1'!==runResult[1].param1
 				||'val2'!==runResult[1].param2) {
