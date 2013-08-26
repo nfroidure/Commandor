@@ -1,5 +1,5 @@
-// AMD + Global: r.js compatible
-// Use START + END markers to keep module content only
+// AMD + global + NodeJS : You can use this object by inserting a script
+// or using an AMD loader (like RequireJS) or using NodeJS
 (function(root,define){ define([], function() {
 // START: Module logic start
 
@@ -279,12 +279,28 @@
 
 	return Commandor;
 
-});})(this,typeof define === 'function' && define.amd ? define : function (name, deps, factory) {
-	var root=this;
-	if(typeof name === 'object') {
-		factory=deps; deps=name; name='Commandor';
-	}
-	this[name.substring(name.lastIndexOf('/')+1)]=factory.apply(this, deps.map(function(dep){
-		return root[dep.substring(dep.lastIndexOf('/')+1)];
-	}));
-}.bind(this));
+
+});})(this,typeof define === 'function' && define.amd ?
+	// AMD
+	define :
+	// NodeJS
+	(typeof exports === 'object'?function (name, deps, factory) {
+		var root=this;
+		if(typeof name === 'object') {
+			factory=deps; deps=name;
+		}
+		module.exports=factory.apply(this, deps.map(function(dep){
+			return require(dep);
+		}));
+	}:
+	// Global
+	function (name, deps, factory) {
+		var root=this;
+		if(typeof name === 'object') {
+			factory=deps; deps=name;  name='Commandor';
+		}
+		this[name.substring(name.lastIndexOf('/')+1)]=factory.apply(this, deps.map(function(dep){
+			return root[dep.substring(dep.lastIndexOf('/')+1)];
+		}));
+	}.bind(this))
+);

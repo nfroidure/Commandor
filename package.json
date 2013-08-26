@@ -1,6 +1,6 @@
 {
 	"name": "commandor",
-	"description": "Command events listening, made easy.",
+	"description": "Web Application Commands Mediator.",
 	"version": "0.1.0",
 	"author": "Nicolas Froidure",
 	"repository": {
