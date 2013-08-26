@@ -19,7 +19,7 @@
 		"karma-requirejs": "*"
 	},
 	"scripts": {
-		"test": "karma start karma.conf.js --single-run"
+		"test": "karma start karma.conf.js --single-run && karma start karma-global.conf.js --single-run"
 	},
 	"keywords": [
 		"command",
