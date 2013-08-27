@@ -49,10 +49,17 @@ To dispose a command when no longer used :
 commandManager.unsuscribe('myApp/random');
 ```
 
-You can create many commandor instances to keep your code more modular or you
-cant use namespaced commands like above.
+To dispose the entire command manager (event listeners includes) :
 
-Command can pass parameters to allow you to manage multiple call of the same command :
+```js
+commandManager.dispose();
+```
+
+You can create many commandor instances to keep your code more modular or you
+can use namespaced commands like above.
+
+Command can pass parameters to allow you to manage multiple calls
+ of the same command :
 
 ```html
 <div id="posts">
@@ -74,6 +81,9 @@ commandManager.suscribe('delete',function(event,params,element) {
 	element.parentNode.parentNode.removeChild(element.parentNode);
 });
 ```
+
+The third parameter gives the element that delivered the executed command wich
+ can be differ from the event.target property.
 
 Samples
 --------------
