@@ -12,7 +12,7 @@
 			_keydownListener, _keyupListener,
 			_formChangeListener, _formSubmitListener,
 		// Commands hashmap
-			_commands={};
+			_commands={'____internal':true};
 		;
 		// Testing rootElement
 		if(!rootElement) {
@@ -141,7 +141,7 @@
 			return !!!callback(event,args,element);
 		};
 
-		// Add a callback for the specified path
+		// Add a callback or object for the specified path
 		this.suscribe=function(path,callback) {
 			if(!_commands) {
 				throw Error('Cannot suscribe commands on a disposed Commandor object.');
@@ -150,11 +150,13 @@
 				command=_commands;
 			for(var i=0, j=nodes.length-1; i<j; i++) {
 				if((!command[nodes[i]])||!(command[nodes[i]] instanceof Object)) {
-
-					command[nodes[i]]={};
-					}
-				command=command[nodes[i]];
+					command[nodes[i]]={'____internal':true};
 				}
+				command=command[nodes[i]];
+				if(!command.____internal) {
+					throw Error('Cannot suscribe commands on an external object.');
+				}
+			}
 			command[nodes[i]]=callback;
 		};
 
@@ -167,6 +169,9 @@
 				command=_commands;
 			for(var i=0, j=nodes.length-1; i<j; i++) {
 				command=command[nodes[i]]={};
+			}
+			if(!command.____internal) {
+				throw Error('Cannot unsuscribe commands of an external object.');
 			}
 			command[nodes[i]]=null;
 		};

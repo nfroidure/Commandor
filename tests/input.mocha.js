@@ -157,8 +157,8 @@
 				cmdMgr.suscribe('test', function() { console.log('')});
 				throw Error('Suscribing disposed cmdMgr did not send an error.');
 			} catch(e) {
-				if('Suscribing dispose cmdMgr did not send an error.'===e.message) {
-					throw e;
+				if('Cannot suscribe commands on a disposed Commandor object.'!==e.message) {
+					throw e.message;
 				}
 			}
 		});
@@ -168,8 +168,8 @@
 				cmdMgr.unsuscribe('test', function() { console.log('')});
 				throw Error('Unsuscribing disposed cmdMgr did not send an error.');
 			} catch(e) {
-				if('Unsuscribing dispose cmdMgr did not send an error.'===e.message) {
-					throw e;
+				if('Cannot unsuscribe commands of a disposed Commandor object.'!==e.message) {
+					throw e.message;
 				}
 			}
 		});
@@ -177,10 +177,10 @@
 		it('when executing commands', function() {
 			try {
 				cmdMgr.executeCommand({}, 'test', textInput);
-				throw Error('Suscribing disposed cmdMgr did not send an error.');
+				throw Error('Executin commands of a disposed cmdMgr did not send an error.');
 			} catch(e) {
-				if('Suscribing dispose cmdMgr did not send an error.'===e.message) {
-					throw e;
+				if('Cannot execute command on a disposed Commandor object.'!==e.message) {
+					throw e.message;
 				}
 			}
 		});

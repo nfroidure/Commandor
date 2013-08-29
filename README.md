@@ -12,45 +12,82 @@ How to use Commandor
 Consider this HTML snippet :
 ```html
 <div class="root">
-	<p><a href="app:myApp/button">My button</a></p>
-	<form action="app:myApp/form">
+	<div id="posts">
+		<article>
+			<h1>Post #1</h1>
+			<p><a href="app:delete?id=1">delete</a></p>
+		</article>
+		<article>
+			<h1>Post #2</h1>
+			<p><a href="app:delete?id=2">delete</a></p>
+		</article>
+	</div>
+	<form action="app:App/form">
 		<p>
 			My input : <input type="text" /><br />
-			<input type="submit" formaction="app:myApp/random" value="Random" />
+			<input type="submit" formaction="app:App/clear" value="Clear" />
 			<input type="submit" value="Submit" />
 		</p>
 	</form>
 </div>
 ```
+You can see that a[href], form[action], input[formaction] attributes are filled
+ with app: protocol uris. It maps commands to functions. Query parameters are
+ passed to them.
 
-First, create a Commandor instance in your code, the rootElement can be the
- document body or any other DOM element :
+To use Commandor with this HTML, first, create a Commandor instance in your code,
+ the rootElement can be the document body or any other DOM element :
 
 ```js
-var commandManager=new Commandor(document.querySelector('root'));
+var commandManager=new Commandor(document.querySelector('.root'));
 ```
 
 Then register your commands :
 ```js
-commandManager.suscribe('myApp/button', function(event, params) {
-	console.log('Button activated');
+commandManager.suscribe('App/delete',function(event,params,element) {
+	console.log('Removed article #'+params['id']);
+	element.parentNode.parentNode.removeChild(element.parentNode);
 });
-commandManager.suscribe('myApp/form', function(event, params, form) {
+commandManager.suscribe('App/form', function(event, params, form) {
 	console.log('Form submitted,'+form[0].value);
+	var article=document.createElement('article');
+	article.innerHTML='<h1>'+form[0].value+'</h1>'
+		+'<p><a href="app:delete?id='+Date.now()+'">delete</a></p>';
+	document.querySelector('div.posts').appendChild(article);
 });
-commandManager.suscribe('myApp/random', function(event, params, button) {
-  button.form.elements[button.form.elements.length-3].value=Math.random();
+commandManager.suscribe('myApp/clear', function(event, params, button) {
+  button.form.elements[0].value='';
 });
 ```
+
+You can also directly pass an object, it'll automatically be mapped :
+```js
+var App= {
+	'delete' : function(event,params,element) {
+	console.log('Removed article #'+params['id']);
+	element.parentNode.parentNode.removeChild(element.parentNode);
+	},
+	'form' : function(event, params, form) {
+		console.log('Form submitted,'+form[0].value);
+		var article=document.createElement('article');
+		article.innerHTML='<h1>'+form[0].value+'</h1>'
+			+'<p><a href="app:delete?id='+Date.now()+'">delete</a></p>';
+		document.querySelector('div.posts').appendChild(article);
+	},
+	'clear' : function(event, params, button) {
+  button.form.elements[0].value='';
+	}
+};
+commandManager.suscribe('App',app);
+```
+By doing so, 'this' will be set to the parent object without having to bind methods.
 
 To dispose a command when no longer used :
-
 ```js
-commandManager.unsuscribe('myApp/random');
+commandManager.unsuscribe('App/random');
 ```
 
-To dispose the entire command manager (event listeners includes) :
-
+To dispose the entire command manager (event listeners included) :
 ```js
 commandManager.dispose();
 ```
@@ -58,32 +95,16 @@ commandManager.dispose();
 You can create many commandor instances to keep your code more modular or you
 can use namespaced commands like above.
 
-Command can pass parameters to allow you to manage multiple calls
- of the same command :
 
-```html
-<div id="posts">
-	<article>
-		<h1>title</h1>
-		<p><a href="app:delete?id=1">del</a></p>
-	</article>
-	<article>
-		<h1>title</h1>
-		<p><a href="app:delete?id=2">del</a></p>
-	</article>
-</div>
-```
+About passed parameters to your callbacks
+--------------
 
-```js
-var commandManager=new Commandor(document.getElementById('posts'));
-commandManager.suscribe('delete',function(event,params,element) {
-	console.log('Removed article '+params['id']);
-	element.parentNode.parentNode.removeChild(element.parentNode);
-});
-```
+The first parameter is the event that leaded to the callback execution.
 
-The third parameter gives the element that delivered the executed command wich
- can be differ from the event.target property.
+The second is an object containing the query string parameters.
+
+The third parameter gives the element that delivered the executed command, it
+ can differ from the 'event.target' property.
 
 Samples
 --------------
