@@ -15,11 +15,11 @@ Consider this HTML snippet :
 	<div id="posts">
 		<article>
 			<h1>Post #1</h1>
-			<p><a href="app:delete?id=1">delete</a></p>
+			<p><a href="app:App/delete?id=1">delete</a></p>
 		</article>
 		<article>
 			<h1>Post #2</h1>
-			<p><a href="app:delete?id=2">delete</a></p>
+			<p><a href="app:App/delete?id=2">delete</a></p>
 		</article>
 	</div>
 	<form action="app:App/form">
@@ -52,10 +52,10 @@ commandManager.suscribe('App/form', function(event, params, form) {
 	console.log('Form submitted,'+form[0].value);
 	var article=document.createElement('article');
 	article.innerHTML='<h1>'+form[0].value+'</h1>'
-		+'<p><a href="app:delete?id='+Date.now()+'">delete</a></p>';
-	document.querySelector('div.posts').appendChild(article);
+		+'<p><a href="app:App/delete?id='+Date.now()+'">delete</a></p>';
+	document.querySelector('div#posts').appendChild(article);
 });
-commandManager.suscribe('myApp/clear', function(event, params, button) {
+commandManager.suscribe('App/clear', function(event, params, button) {
   button.form.elements[0].value='';
 });
 ```
@@ -64,8 +64,8 @@ You can also directly pass an object, it'll automatically be mapped :
 ```js
 var App= {
 	'delete' : function(event,params,element) {
-	console.log('Removed article #'+params['id']);
-	element.parentNode.parentNode.removeChild(element.parentNode);
+		console.log('Removed article #'+params['id']);
+		element.parentNode.parentNode.removeChild(element.parentNode);
 	},
 	'form' : function(event, params, form) {
 		console.log('Form submitted,'+form[0].value);
@@ -75,10 +75,10 @@ var App= {
 		document.querySelector('div.posts').appendChild(article);
 	},
 	'clear' : function(event, params, button) {
-  button.form.elements[0].value='';
+  	button.form.elements[0].value='';
 	}
 };
-commandManager.suscribe('App',app);
+commandManager.suscribe('App',App);
 ```
 By doing so, 'this' will be set to the parent object without having to bind methods.
 

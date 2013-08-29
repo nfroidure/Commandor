@@ -122,22 +122,32 @@
 			// the first chunk is the command path
 			var callback=_commands;
 			var nodes=chunks[0].split('/');
-			for(var i=0, j=nodes.length; i<j; i++) {
-			if(!callback[nodes[i]])
-				throw Error('Cannot execute the following command "'+command+'".');
+			for(var i=0, j=nodes.length; i<j-1; i++) {
+				if(!callback[nodes[i]]) {
+					throw Error('Cannot execute the following command "'+command+'".');
+				}
 				callback=callback[nodes[i]];
+			}
+			if('function' !== typeof callback[nodes[i]]) {
+				throw Error('Cannot execute the following command "'+command+'", not a fucntion.');
 			}
 			// Preparing arguments
 			var args={};
 			if(chunks[1]) {
 				chunks=chunks[1].split('&');
-				for(var i=0, j=chunks.length; i<j; i++) {
-					var parts=chunks[i].split('=');
-					if(undefined!==parts[0]&&undefined!==parts[1])
+				for(var k=0, l=chunks.length; k<l; k++) {
+					var parts=chunks[k].split('=');
+					if(undefined!==parts[0]&&undefined!==parts[1]) {
 						args[parts[0]]=decodeURIComponent(parts[1]);
+					}
 				}
 			}
 			// executing the command fallback
+			if(callback.____internal) {
+				return !!!((callback[nodes[i]])(event,args,element));
+			} else {
+				return !!!(callback[nodes[i]](event,args,element));
+			}
 			return !!!callback(event,args,element);
 		};
 
