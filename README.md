@@ -9,7 +9,7 @@ It introduce an app: protocol to refer to commands directly inside your HTML.
 How to use Commandor
 --------------
 
-Consider this HTML snippet :
+Consider this HTML snippet (JSFiddle: http://jsfiddle.net/FQEp2/ ) :
 ```html
 <div class="root">
 	<div id="posts">
@@ -46,7 +46,8 @@ Then register your commands :
 ```js
 commandManager.suscribe('App/delete',function(event,params,element) {
 	console.log('Removed article #'+params['id']);
-	element.parentNode.parentNode.removeChild(element.parentNode);
+	element.parentNode.parentNode.parentNode.removeChild(
+		element.parentNode.parentNode);
 });
 commandManager.suscribe('App/form', function(event, params, form) {
 	console.log('Form submitted,'+form[0].value);
@@ -54,9 +55,10 @@ commandManager.suscribe('App/form', function(event, params, form) {
 	article.innerHTML='<h1>'+form[0].value+'</h1>'
 		+'<p><a href="app:App/delete?id='+Date.now()+'">delete</a></p>';
 	document.querySelector('div#posts').appendChild(article);
+	form.elements[0].value='';
 });
 commandManager.suscribe('App/clear', function(event, params, button) {
-  button.form.elements[0].value='';
+	button.form.elements[0].value='';
 });
 ```
 
@@ -65,17 +67,19 @@ You can also directly pass an object, it'll automatically be mapped :
 var App= {
 	'delete' : function(event,params,element) {
 		console.log('Removed article #'+params['id']);
-		element.parentNode.parentNode.removeChild(element.parentNode);
+		element.parentNode.parentNode.parentNode.removeChild(
+			element.parentNode.parentNode);
 	},
 	'form' : function(event, params, form) {
 		console.log('Form submitted,'+form[0].value);
 		var article=document.createElement('article');
 		article.innerHTML='<h1>'+form[0].value+'</h1>'
-			+'<p><a href="app:delete?id='+Date.now()+'">delete</a></p>';
-		document.querySelector('div.posts').appendChild(article);
+			+'<p><a href="app:App/delete?id='+Date.now()+'">delete</a></p>';
+		document.querySelector('div#posts').appendChild(article);
+		form.elements[0].value='';
 	},
 	'clear' : function(event, params, button) {
-  	button.form.elements[0].value='';
+		button.form.elements[0].value='';
 	}
 };
 commandManager.suscribe('App',App);
