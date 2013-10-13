@@ -305,7 +305,8 @@
 		var element=this.findFormChange(event.target),
 			command='';
 		// searching the data-change attribute containing the command
-		if('FORM'===element.nodeName&&element.hasAttribute('data-change')) {
+		if(element&&'FORM'===element.nodeName
+			&&element.hasAttribute('data-change')) {
 			command=element.getAttribute('data-change');
 		}
 		// executing the command
