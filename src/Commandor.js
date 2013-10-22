@@ -5,7 +5,7 @@
 
 	// Commandor constructor : rootElement is the element
 	// from wich we capture commands
-	var Commandor=function Commandor(rootElement) {
+	var Commandor=function Commandor(rootElement, prefix) {
 		// event handlers
 		var _pointerDownListener, _pointerUpListener, _pointerClickListener,
 			_touchstartListener, _touchendListener, _clickListener,
@@ -14,6 +14,8 @@
 		// Commands hashmap
 			_commands={'____internal':true};
 		;
+		// Command prefix
+		this.prefix = prefix || 'app:';
 		// Testing rootElement
 		if(!rootElement) {
 			throw Error('No rootElement given');
@@ -113,11 +115,11 @@
 			if(!_commands) {
 				throw Error('Cannot execute command on a disposed Commandor object.');
 			}
-			// checking for the app protocol
-			if(0!==command.indexOf('app:'))
+			// checking for the prefix
+			if(0!==command.indexOf(this.prefix))
 				return false;
-			// removing app:
-			command=command.substr(4);
+			// removing the prefix
+			command=command.substr(this.prefix.length);
 			var chunks=command.split('?');
 			// the first chunk is the command path
 			var callback=_commands;
@@ -217,14 +219,14 @@
 		while(element&&element.parentNode) {
 			if('A'===element.nodeName
 				&&element.hasAttribute('href')
-				&&-1!==element.getAttribute('href').indexOf('app:')) {
+				&&-1!==element.getAttribute('href').indexOf(this.prefix)) {
 				return element;
 			}
 			if('INPUT'===element.nodeName&&element.hasAttribute('type')
 				&&(element.getAttribute('type')=='submit'
 						||element.getAttribute('type')=='button')
 				&&element.hasAttribute('formaction')
-				&&-1!==element.getAttribute('formaction').indexOf('app:')
+				&&-1!==element.getAttribute('formaction').indexOf(this.prefix)
 				) {
 				return element;
 			}
@@ -243,7 +245,7 @@
 			&&'submit'===element.getAttribute('type'))) {
 			while(element&&element.parentNode) {
 				if('FORM'===element.nodeName&&element.hasAttribute('action')
-					&&-1!==element.getAttribute('action').indexOf('app:')) {
+					&&-1!==element.getAttribute('action').indexOf(this.prefix)) {
 					return element;
 				}
 				if(element===this.rootElement) {
@@ -260,7 +262,7 @@
 	Commandor.prototype.findFormChange=function(element) {
 		while(element&&element.parentNode) {
 			if('FORM'===element.nodeName&&element.hasAttribute('action')
-				&&-1!==element.getAttribute('action').indexOf('app:')) {
+				&&-1!==element.getAttribute('action').indexOf(this.prefix)) {
 				return element;
 			}
 			if(element===this.rootElement) {
