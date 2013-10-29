@@ -34,12 +34,9 @@
 
 		it('when typing content in', function() {
 			runResult=null;
-			textInput.focus();
-			hlp.type(textInput,{charCode:65, keyCode:65});
-			hlp.event(textInput,{type:'input'});
-			hlp.type(textInput,{charCode:65, keyCode:65});
-			hlp.event(textInput,{type:'input'});
-			selectInput.focus();
+			effroi.keyboard.focus(textInput);
+			effroi.keyboard.hit('A','A');
+			effroi.keyboard.focus(selectInput);
 			hlp.event(textInput,{type:'change'});
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -59,12 +56,9 @@
 
 		it('when typing content in', function() {
 			runResult=null;
-			textInput.focus();
-			hlp.type(textarea,{charCode:65, keyCode:65});
-			hlp.event(textarea,{type:'input'});
-			hlp.type(textarea,{charCode:65, keyCode:65});
-			hlp.event(textarea,{type:'input'});
-			selectInput.focus();
+			effroi.keyboard.focus(textInput);
+			effroi.keyboard.hit('A','A');
+			effroi.keyboard.focus(selectInput);
 			hlp.event(textarea,{type:'change'});
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -84,9 +78,9 @@
 
 		it('when selecting another item', function() {
 			runResult=null;
-			selectInput.focus();
+			effroi.keyboard.focus(selectInput);
 			selectInput.value='B';
-			checkboxInput.focus();
+			effroi.keyboard.focus(checkboxInput);
 			hlp.event(textarea,{type:'select'});
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -106,9 +100,9 @@
 
 		it('when changing their state to checked', function() {
 			runResult=null;
-			checkboxInput.focus();
-			hlp.click(checkboxInput);
-			textInput.focus();
+			effroi.keyboard.focus(checkboxInput);
+			effroi.mouse.click(checkboxInput);
+			effroi.keyboard.focus(textInput);
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -126,9 +120,9 @@
 
 		it('when changing their state to unchecked', function() {
 			runResult=null;
-			checkboxInput.focus();
-			hlp.click(checkboxInput);
-			textInput.focus();
+			effroi.keyboard.focus(checkboxInput);
+			effroi.mouse.click(checkboxInput);
+			effroi.keyboard.focus(textInput);
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

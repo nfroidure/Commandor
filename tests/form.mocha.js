@@ -1,7 +1,7 @@
 // AMD + Global: r.js compatible
 // Use START + END markers to keep module content only
-(function(root,define){ define(['src/Commandor','tests/EventSimulator',
-	'tests/polyfills.karma'], function(Commandor,hlp,p) {
+(function(root,define){ define(['src/Commandor',
+	'tests/polyfills.karma'], function(Commandor,p) {
 // START: Module logic start
 
 	// Tests
@@ -27,10 +27,10 @@
 		// Simple submit button
 		it('when clicking a submit button', function() {
 			runResult=null;
-			if(!!('onmsgesturechange' in window)) {
-				hlp.point(submitButton);
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.point(submitButton);
 			} else {
-				hlp.click(submitButton);
+				effroi.mouse.click(submitButton);
 			}
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -44,10 +44,10 @@
 			}
 		});
 
-		if(!!('ontouchstart' in window)) {
+		if(effroi.tactile.isConnected()) {
 			it('when touching a submit button', function() {
 				runResult=null;
-				hlp.touch(submitButton);
+				effroi.tactile.touch(submitButton);
 				if(null===runResult) {
 					throw 'Not well executed';
 				}
@@ -63,8 +63,8 @@
 
 		it('when pressing enter key on a submit button', function() {
 			runResult=null;
-			submitButton.focus();
-			hlp.type(submitButton,{type:'keyup',keyCode:13});
+			effroi.keyboard.focus(submitButton);
+			effroi.keyboard.hit(effroi.keyboard.ENTER);
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -81,9 +81,9 @@
 		it('when clicking a submit button with formaction', function() {
 			runResult=null;
 			if(!!('onmsgesturechange' in window)) {
-				hlp.point(actionButton);
+				effroi.pointers.point(actionButton);
 			} else {
-				hlp.click(actionButton);
+				effroi.mouse.click(actionButton);
 			}
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -100,7 +100,7 @@
 		if(!!('ontouchstart' in window)) {
 			it('when touching a submit button with formaction', function() {
 				runResult=null;
-				hlp.touch(actionButton);
+				effroi.tactile.touch(actionButton);
 				if(null===runResult) {
 					throw 'Not well executed';
 				}
@@ -116,8 +116,8 @@
 
 		it('when pressing enter key on a submit button with formaction', function() {
 			runResult=null;
-			submitButton.focus();
-			hlp.type(actionButton,{type:'keyup',keyCode:13});
+			effroi.keyboard.focus(actionButton);
+			effroi.keyboard.hit(effroi.keyboard.ENTER);
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

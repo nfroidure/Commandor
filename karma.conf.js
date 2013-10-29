@@ -9,7 +9,7 @@ module.exports = function(config) {
 
 
     // frameworks to use
-    frameworks: ['mocha', 'requirejs'],
+    frameworks: ['mocha', 'requirejs', 'effroi'],
 
 
     // list of files / patterns to load in the browser

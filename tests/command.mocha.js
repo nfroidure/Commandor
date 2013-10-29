@@ -1,7 +1,7 @@
 // AMD + Global: r.js compatible
 // Use START + END markers to keep module content only
-(function(root,define){ define(['src/Commandor','tests/EventSimulator',
-	'tests/polyfills.karma'], function(Commandor,hlp,p) {
+(function(root,define){ define(['src/Commandor',
+	'tests/polyfills.karma'], function(Commandor,p) {
 // START: Module logic start
 
 	// Tests
@@ -26,10 +26,10 @@
 
 		it('when clicking a link', function() {
 			runResult=null;
-			if(!!('onmsgesturechange' in window)) {
-				hlp.point(a);
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.touch(a);
 			} else {
-				hlp.click(a);
+				effroi.mouse.click(a.firstChild);
 			}
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -43,10 +43,10 @@
 			}
 		});
 
-		if(!!('ontouchstart' in window)) {
+		if(effroi.tactile.isConnected()) {
 			it('when touching a link', function() {
 				runResult=null;
-				hlp.touch(a);
+				effroi.tactile.touch(a.firstChild);
 				if(null===runResult) {
 					throw 'Not well executed';
 				}
@@ -62,8 +62,8 @@
 
 		it('when pressing enter key on a link', function() {
 			runResult=null;
-			a.focus();
-			hlp.type(a,{keyCode:13});
+			effroi.keyboard.focus(a);
+			effroi.keyboard.hit(effroi.keyboard.ENTER);
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

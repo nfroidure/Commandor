@@ -16,7 +16,8 @@
 		"karma-mocha": "*",
 		"karma-firefox-launcher": "~0.1",
 		"karma-slimerjs-launcher": "0.1.2",
-		"karma-requirejs": "*"
+		"karma-requirejs": "*",
+		"karma-affroi": "*"
 	},
 	"scripts": {
 		"test": "karma start karma.conf.js --single-run && karma start karma-global.conf.js --single-run"
