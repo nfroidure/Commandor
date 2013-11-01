@@ -1,7 +1,7 @@
 // AMD + Global: r.js compatible
 // Use START + END markers to keep module content only
-(function(root,define){ define(['src/Commandor','tests/EventSimulator',
-	'tests/polyfills.karma'], function(Commandor,hlp,p) {
+(function(root,define){ define(['src/Commandor', 'tests/polyfills.karma'],
+	function(Commandor,p) {
 // START: Module logic start
 
 	// Prepraring tests
@@ -45,10 +45,10 @@
 
 		it('when clicking on the link', function() {
 			runResult=null;
-			if(!!('onmsgesturechange' in window)) {
-				hlp.point(a);
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.point(a.firstChild);
 			} else {
-				hlp.click(a);
+				effroi.mouse.click(a.firstChild);
 			}
 			if(null===runResult) {
 				throw 'Not well executed';
@@ -68,10 +68,10 @@
 
 		it('when clicking on the link', function() {
 			runResult=null;
-			if(!!('onmsgesturechange' in window)) {
-				hlp.point(a2);
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.point(a2.firstChild);
 			} else {
-				hlp.click(a2);
+				effroi.mouse.click(a2.firstChild);
 			}
 			if(null===runResult) {
 				throw 'Not well executed';

@@ -14,10 +14,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-    	'tests/main.karma.js',
+      'tests/main.karma.js',
       {pattern: 'src/*.js', included: false},
       {pattern: 'tests/polyfills.karma.js', included: false},
-      {pattern: 'tests/EventSimulator.js', included: false},
       {pattern: 'tests/*.mocha.js', included: false}
     ],
 

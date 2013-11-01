@@ -1,11 +1,9 @@
 // AMD + Global: r.js compatible
 // Use START + END markers to keep module content only
-(function(root,define){ define(['src/Commandor','tests/EventSimulator',
-	'tests/polyfills.karma'], function(Commandor,hlp,p) {
+(function(root,define){ define(['src/Commandor', 'tests/polyfills.karma'],
+  function(Commandor,p) {
 // START: Module logic start
 
-
-	
 	// Creating markup
 	var div=document.createElement('div');
 	div.innerHTML='<form action="app:inputtest?param1=val1&param2=val2" data-change="app:inputtest?param5=val5&param6=val6">'
@@ -37,7 +35,6 @@
 			effroi.keyboard.focus(textInput);
 			effroi.keyboard.hit('A','A');
 			effroi.keyboard.focus(selectInput);
-			hlp.event(textInput,{type:'change'});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -59,7 +56,6 @@
 			effroi.keyboard.focus(textInput);
 			effroi.keyboard.hit('A','A');
 			effroi.keyboard.focus(selectInput);
-			hlp.event(textarea,{type:'change'});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}
@@ -81,7 +77,6 @@
 			effroi.keyboard.focus(selectInput);
 			selectInput.value='B';
 			effroi.keyboard.focus(checkboxInput);
-			hlp.event(textarea,{type:'select'});
 			if(null===runResult) {
 				throw 'Not well executed';
 			}

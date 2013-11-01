@@ -1,7 +1,7 @@
 // AMD + Global: r.js compatible
 // Use START + END markers to keep module content only
-(function(root,define){ define(['src/Commandor',
-	'tests/polyfills.karma'], function(Commandor,p) {
+(function(root,define){ define(['src/Commandor', 'tests/polyfills.karma'],
+	function(Commandor,p) {
 // START: Module logic start
 
 	// Tests
