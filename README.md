@@ -9,7 +9,7 @@ It introduce an app: protocol to refer to commands directly inside your HTML.
 How to use Commandor
 --------------
 
-Consider this HTML snippet (JSFiddle: http://jsfiddle.net/FQEp2/ ) :
+Consider [this HTML snippet](http://jsfiddle.net/FQEp2/1/):
 ```html
 <div class="root">
 	<div id="posts">
@@ -112,11 +112,10 @@ The third parameter gives the element that delivered the executed command, it
 
 Samples
 --------------
-*	Here are some apps using Commandor :
-* * http://hexa.insertafter.com/index.html
-* * http://memory.insertafter.com/index.html
-* * http://breakit.elitwork.com/index.html
-* * http://liar.insertafter.com/index.html
+Here are some apps using Commandor :
+* [Hexa](http://hexa.insertafter.com/index.html)
+* [Memory](http://memory.insertafter.com/index.html)
+* [BreakIt](http://breakit.elitwork.com/index.html)
 
 Supported browsers
 --------------
@@ -124,6 +123,3 @@ Firefox, Chrome, Opera and IE9+ (fully tested).
 Safari should be ok (not tested, DIY or buy me a Mac).
 IE8 by polyfilling (bind + addEventListener) (never tried).
 
-About CommandPromise
---------------
-This is intended to be used with this Promise library : https://github.com/nfroidure/Promise
