@@ -1,30 +1,26 @@
 // Karma configuration
-// Generated on Fri Aug 16 2013 14:04:23 GMT+0200 (CEST)
+// Generated on Tue Oct 15 2013 15:27:53 GMT+0200 (CEST)
 
 module.exports = function(config) {
   config.set({
 
     // base path, that will be used to resolve files and exclude
-    basePath: '.',
+    basePath: '',
 
 
     // frameworks to use
-    frameworks: ['mocha', 'requirejs', 'effroi'],
+    frameworks: ['mocha','chai','sinon', 'effroi'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      'tests/main.karma.js',
-      {pattern: 'src/*.js', included: false},
-      {pattern: 'tests/polyfills.karma.js', included: false},
-      {pattern: 'tests/*.mocha.js', included: false}
+      'dist/Commandor.js',
+      'tests/**/*.js'
     ],
 
 
-    /*// list of files to exclude
-    exclude: [
-      
-    ],*/
+    // list of files to exclude
+    exclude: [],
 
 
     // test results reporter to use
@@ -57,7 +53,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: process.env.TRAVIS ? ['Firefox'] : ['Chrome', 'PhantomJS', 'SlimerJS', 'Firefox', 'Opera'],
+    browsers: process.env.TRAVIS ? ['Firefox'] : ['Chrome', 'Firefox', 'Opera'],
 
 
     // If browser does not capture in given timeout [ms], kill it
