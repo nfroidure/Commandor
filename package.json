@@ -40,6 +40,5 @@
   "keywords": [
     "command",
     "events"
-  ],
-  "preferGlobal": "false"
+  ]
 }
