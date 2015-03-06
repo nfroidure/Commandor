@@ -97,6 +97,22 @@ describe('Link commands', function() {
 
 		});
 
+		it('when clicking a link while disabled', function() {
+	    var callback = sinon.spy();
+			cmdMgr.suscribe('commandtest', callback);
+			a.setAttribute('disabled', 'disabled');
+
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.touch(a);
+			} else {
+				effroi.mouse.click(a.firstChild);
+			}
+
+			assert(!callback.called, 'Callback never called');
+			cmdMgr.dispose();
+
+		});
+
 	});
 
 });

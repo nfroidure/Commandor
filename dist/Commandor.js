@@ -2,24 +2,37 @@
 // Commandor constructor : rootElement is the element
 // from wich we capture commands
 var Commandor = function Commandor(rootElement, prefix) {
-	// event handlers
-	var _pointerDownListener, _pointerUpListener, _pointerClickListener,
-		_touchstartListener, _touchendListener, _clickListener,
-		_keydownListener, _keyupListener,
-		_formChangeListener, _formSubmitListener,
+	// Event handlers
+	var _pointerDownListener;
+	var _pointerUpListener;
+	var _pointerClickListener;
+	var	_touchstartListener;
+	var _touchendListener;
+	var _clickListener;
+	var	_keydownListener;
+	var _keyupListener;
+	var	_formChangeListener;
+	var _formSubmitListener;
+
 	// Commands hashmap
-		_commands = {'____internal':true}
-	;
+	var	_commands = {
+		'____internal': true
+	};
+
 	// Command prefix
 	this.prefix = prefix || 'app:';
+
 	// Testing rootElement
 	if(!rootElement) {
 		throw Error('No rootElement given');
 	}
+
 	// keeping a reference to the rootElement
 	this.rootElement = rootElement;
+
 	// MS Pointer events : should unify pointers, but... read and see by yourself.
 	if(!!('onmsgesturechange' in window)) {
+
 		// event listeners for buttons
 		(function() {
 			var curElement = null;
@@ -42,14 +55,15 @@ var Commandor = function Commandor(rootElement, prefix) {
 			this.rootElement.addEventListener('MSPointerDown', _pointerDownListener, true);
 			this.rootElement.addEventListener('MSPointerUp', _pointerUpListener, true);
 		}).call(this);
+
 		// fucking IE10 bug : it doesn't cancel click event
 		// when gesture events are cancelled
-		_pointerClickListener = function(event){
-				if(this.findButton(event.target)) {
-					event.preventDefault();
-					event.stopPropagation();
-				}
-			}.bind(this);
+		_pointerClickListener = function(event) {
+			if(this.findButton(event.target)) {
+				event.preventDefault();
+				event.stopPropagation();
+			}
+		}.bind(this);
 		this.rootElement.addEventListener('click', _pointerClickListener,true);
 	} else {
 		// Touch events
@@ -82,15 +96,22 @@ var Commandor = function Commandor(rootElement, prefix) {
 	// Keyboard events
 	// Cancel keydown action (no click event)
 	_keydownListener = function(event) {
-		if(13 === event.keyCode&&(this.findButton(event.target) ||
-			this.findForm(event.target))) {
+		if(
+			13 === event.keyCode && (
+				this.findButton(event.target) ||
+				this.findForm(event.target)
+			)
+		) {
 			event.preventDefault() && event.stopPropagation();
 		}
 	}.bind(this);
 	this.rootElement.addEventListener('keydown', _keydownListener, true);
 	// Fire on keyup
 	_keyupListener = function(event) {
-		if(13 === event.keyCode && !event.ctrlKey) {
+		if(
+			13 === event.keyCode &&
+			!event.ctrlKey
+		) {
 			if(this.findButton(event.target)) {
 				this.captureButton.apply(this, arguments);
 			} else {
@@ -113,8 +134,9 @@ var Commandor = function Commandor(rootElement, prefix) {
 			throw Error('Cannot execute command on a disposed Commandor object.');
 		}
 		// checking for the prefix
-		if(0 !== command.indexOf(this.prefix))
+		if(0 !== command.indexOf(this.prefix)) {
 			return false;
+		}
 		// removing the prefix
 		command = command.substr(this.prefix.length);
 		var chunks = command.split('?');
@@ -219,17 +241,22 @@ var Commandor = function Commandor(rootElement, prefix) {
 // Look for a button
 Commandor.prototype.findButton = function(element) {
 	while(element && element.parentNode) {
-		if('A' === element.nodeName &&
-			element.hasAttribute('href') &&
-			-1 !== element.getAttribute('href').indexOf(this.prefix)) {
+		if(
+			'A' === element.nodeName &&
+			element.getAttribute('href') &&
+			-1 !== element.getAttribute('href').indexOf(this.prefix)
+		) {
 			return element;
 		}
-		if('INPUT'===element.nodeName && element.hasAttribute('type') &&
-			(element.getAttribute('type') == 'submit' ||
-					element.getAttribute('type') == 'button') &&
-			element.hasAttribute('formaction') &&
+		if(
+			'INPUT' === element.nodeName &&
+			element.getAttribute('type') && (
+				element.getAttribute('type') == 'submit' ||
+				element.getAttribute('type') == 'button'
+			) &&
+			element.getAttribute('formaction') &&
 			-1 !== element.getAttribute('formaction').indexOf(this.prefix)
-			) {
+		) {
 			return element;
 		}
 		if(element === this.rootElement) {
@@ -242,12 +269,19 @@ Commandor.prototype.findButton = function(element) {
 
 // Look for a form
 Commandor.prototype.findForm = function(element) {
-	if('FORM' === element.nodeName||
-		('INPUT' === element.nodeName && element.hasAttribute('type') &&
-		'submit' === element.getAttribute('type'))) {
+	if(
+		'FORM' === element.nodeName || (
+			'INPUT' === element.nodeName &&
+			element.getAttribute('type') &&
+		 'submit' === element.getAttribute('type')
+		 )
+	) {
 		while(element && element.parentNode) {
-			if('FORM' === element.nodeName&&element.hasAttribute('action') &&
-				-1 !== element.getAttribute('action').indexOf(this.prefix)) {
+			if(
+				'FORM' === element.nodeName &&
+				element.getAttribute('action') &&
+				-1 !== element.getAttribute('action').indexOf(this.prefix)
+			) {
 				return element;
 			}
 			if(element === this.rootElement) {
@@ -263,8 +297,11 @@ Commandor.prototype.findForm = function(element) {
 // Look for form change
 Commandor.prototype.findFormChange = function(element) {
 	while(element && element.parentNode) {
-		if('FORM' === element.nodeName && element.hasAttribute('action') &&
-			-1 !== element.getAttribute('action').indexOf(this.prefix)) {
+		if(
+			'FORM' === element.nodeName &&
+			element.getAttribute('action') &&
+			-1 !== element.getAttribute('action').indexOf(this.prefix)
+		) {
 			return element;
 		}
 		if(element === this.rootElement) {
@@ -295,8 +332,7 @@ Commandor.prototype.captureButton = function(event) {
 	// if there is a button, stop event
 	if(element) {
 		// if the button is not disabled, run the command
-		if((!element.hasAttribute('disabled')) ||
-			'disabled' === element.getAttribute('disabled')) {
+		if('disabled' !== element.getAttribute('disabled')) {
 			this.doCommandOfButton(element, event);
 		}
 		event.stopPropagation() || event.preventDefault();
@@ -306,11 +342,10 @@ Commandor.prototype.captureButton = function(event) {
 // Form change handler
 Commandor.prototype.formChange = function(event) {
 	// find the evolved form
-	var element = this.findFormChange(event.target),
-		command = '';
+	var element = this.findFormChange(event.target);
+	var command = '';
 	// searching the data-change attribute containing the command
-	if(element && 'FORM' === element.nodeName &&
-		element.hasAttribute('data-change')) {
+	if(element && 'FORM' === element.nodeName) {
 		command = element.getAttribute('data-change');
 	}
 	// executing the command
@@ -334,8 +369,7 @@ Commandor.prototype.captureForm = function(event) {
 	// if there is a button, stop event
 	if(element) {
 		// if the button is not disabled, run the command
-		if((!element.hasAttribute('disabled')) ||
-			'disabled' === element.getAttribute('disabled')) {
+		if('disabled' !== element.getAttribute('disabled')) {
 			this.doCommandOfForm(element, event);
 		}
 		event.stopPropagation() || event.preventDefault();
