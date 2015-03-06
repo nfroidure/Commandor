@@ -1,83 +1,102 @@
-var Commandor = (
-	'undefined' === typeof window.Commandor ?
-	require('./Commandor') :
-	window.Commandor
-);
+var assert = chai.assert;
 
 // Tests
-describe('Link commands should work', function(){
+describe('Link commands', function() {
 
-	var div=document.createElement('div');
-	var cmdMgr=new Commandor(div);
-	var runResult=null;
-	function testCommand() {
-	var n=runResult&&runResult.n?runResult.n:0;
-		runResult=Array.prototype.slice.call(arguments,0);
-		runResult.n=++n;
-	}
-	cmdMgr.suscribe('commandtest',testCommand);
-	var a=document.createElement('a');
-	a.setAttribute('href','app:commandtest?param1=val1&param2=val2');
-	var span=document.createElement('span');
-	span.appendChild(document.createTextNode('test'));
-	a.appendChild(span);
-	div.appendChild(a);
-	document.body.appendChild(div);
+	var div;
+	var cmdMgr;
+	var a;
+	var span;
 
-	it('when clicking a link', function() {
-		runResult=null;
-		if(effroi.pointers.isConnected()) {
-			effroi.pointers.touch(a);
-		} else {
-			effroi.mouse.click(a.firstChild);
-		}
-		if(null===runResult) {
-			throw 'Not well executed';
-		}
-		if(1!==runResult.n) {
-			throw 'Runned to many times ('+runResult.n+'/1).';
-		}
-		if('val1'!==runResult[1].param1
-			||'val2'!==runResult[1].param2) {
-			throw 'Bad params !';
-		}
+	beforeEach(function() {
+		div = document.createElement('div');
+		a = document.createElement('a');
+		a.setAttribute('href','app:commandtest?param1=val1&param2=val2');
+		span = document.createElement('span');
+		span.appendChild(document.createTextNode('test'));
+		a.appendChild(span);
+		div.appendChild(a);
+		document.body.appendChild(div);
+
+		cmdMgr = new Commandor(div);
 	});
 
-	if(effroi.tactile.isConnected()) {
-		it('when touching a link', function() {
-			runResult=null;
-			effroi.tactile.touch(a.firstChild);
-			if(null===runResult) {
-				throw 'Not well executed';
-			}
-			if(1!==runResult.n) {
-				throw 'Runned to many times ('+runResult.n+'/1).';
-			}
-			if('val1'!==runResult[1].param1
-				||'val2'!==runResult[1].param2) {
-				throw 'Bad params !';
-			}
+	afterEach(function() {
+		document.body.removeChild(div);
+	});
+
+	describe('should work', function() {
+
+		afterEach(function() {
+			cmdMgr.dispose();
 		});
-	}
 
-	it('when pressing enter key on a link', function() {
-		runResult=null;
-		effroi.keyboard.focus(a);
-		effroi.keyboard.hit(effroi.keyboard.ENTER);
-		if(null===runResult) {
-			throw 'Not well executed';
+		it('when clicking a link', function() {
+	    var callback = sinon.spy();
+			cmdMgr.suscribe('commandtest', callback);
+
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.touch(a);
+			} else {
+				effroi.mouse.click(a.firstChild);
+			}
+
+			assert(callback.calledOnce, 'Callback called once');
+			assert.equal(callback.getCall(0).args[1].param1, 'val1');
+			assert.equal(callback.getCall(0).args[1].param2, 'val2');
+
+		});
+
+		if(effroi.tactile.isConnected()) {
+
+			it('when touching a link', function() {
+
+		    var callback = sinon.spy();
+				cmdMgr.suscribe('commandtest', callback);
+
+				effroi.tactile.touch(a.firstChild);
+
+				assert(callback.calledOnce, 'Callback called once');
+				assert.equal(callback.getCall(0).args[1].param1, 'val1');
+				assert.equal(callback.getCall(0).args[1].param2, 'val2');
+
+			});
+
 		}
-		if(1!==runResult.n) {
-			throw 'Runned to many times ('+runResult.n+'/1).';
-		}
-		if('val1'!==runResult[1].param1
-			||'val2'!==runResult[1].param2) {
-			throw 'Bad params !';
-		}
+
+		it('when pressing enter key on a link', function() {
+
+		    var callback = sinon.spy();
+				cmdMgr.suscribe('commandtest', callback);
+
+				effroi.keyboard.focus(a);
+				effroi.keyboard.hit(effroi.keyboard.ENTER);
+
+				assert(callback.calledOnce, 'Callback called once');
+				assert.equal(callback.getCall(0).args[1].param1, 'val1');
+				assert.equal(callback.getCall(0).args[1].param2, 'val2');
+
+		});
+
 	});
 
-	it('until it is disposed', function() {
-		cmdMgr.dispose();
+	describe('should fail', function() {
+
+		it('when clicking a link while disposed', function() {
+	    var callback = sinon.spy();
+			cmdMgr.suscribe('commandtest', callback);
+			cmdMgr.dispose();
+
+			if(effroi.pointers.isConnected()) {
+				effroi.pointers.touch(a);
+			} else {
+				effroi.mouse.click(a.firstChild);
+			}
+
+			assert(!callback.called, 'Callback never called');
+
+		});
+
 	});
 
 });
