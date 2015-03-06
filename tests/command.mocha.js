@@ -11,14 +11,14 @@ describe('Link commands', function() {
 	beforeEach(function() {
 		div = document.createElement('div');
 		a = document.createElement('a');
-		a.setAttribute('href','app:commandtest?param1=val1&param2=val2');
+		a.setAttribute('href','#commandtest?param1=val1&param2=val2');
 		span = document.createElement('span');
 		span.appendChild(document.createTextNode('test'));
 		a.appendChild(span);
 		div.appendChild(a);
 		document.body.appendChild(div);
 
-		cmdMgr = new Commandor(div);
+		cmdMgr = new Commandor(div, '#');
 	});
 
 	afterEach(function() {
