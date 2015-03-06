@@ -355,9 +355,9 @@ Commandor.prototype.formChange = function(event) {
 // Extract the command for a button
 Commandor.prototype.doCommandOfForm = function(element, event) {
 	var command = '';
-	// looking for a button with formaction attribute
+	// looking for the closest form action attribute
 	if('FORM' === element.nodeName) {
-		command=element.getAttribute('action');
+		command = element.getAttribute('action');
 	}
 	// executing the command
 	this.executeCommand(event, command, element);
